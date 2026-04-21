@@ -91,6 +91,11 @@ router.put('/profile', protect, async (req, res) => {
     if (user) {
         user.name = req.body.name || user.name;
         user.email = req.body.email || user.email;
+        user.weight = req.body.weight !== undefined ? req.body.weight : user.weight;
+        user.height = req.body.height !== undefined ? req.body.height : user.height;
+        user.age = req.body.age !== undefined ? req.body.age : user.age;
+        user.gender = req.body.gender !== undefined ? req.body.gender : user.gender;
+
         if (req.body.password) {
             user.password = req.body.password;
         }
@@ -100,6 +105,10 @@ router.put('/profile', protect, async (req, res) => {
             _id: updatedUser._id,
             name: updatedUser.name,
             email: updatedUser.email,
+            weight: updatedUser.weight,
+            height: updatedUser.height,
+            age: updatedUser.age,
+            gender: updatedUser.gender,
             token: generateToken(updatedUser._id),
         });
     } else {
