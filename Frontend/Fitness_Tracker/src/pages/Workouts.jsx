@@ -124,7 +124,7 @@ const DetailedWorkoutCard = ({ workout }) => (
 const SuggestionCard = ({ title, time, cals, color }) => (
   <div className="workout-card" style={{ position: 'relative', overflow: 'hidden' }}>
     <div style={{ position: 'absolute', top: '-10px', right: '-10px', width: '100px', height: '100px', background: `${color}10`, borderRadius: '50%' }}></div>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', z-index: 1 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
       <div>
         <div className="wc-title" style={{fontFamily: 'Bebas Neue', fontSize: '24px'}}>{title.toUpperCase()}</div>
         <div className="wc-meta" style={{ marginBottom: '0', fontWeight: '600' }}>{time} • {cals} Kcal</div>
