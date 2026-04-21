@@ -26,6 +26,7 @@ const Dashboard = () => {
   }, []);
 
   const fetchInitialData = async () => {
+    if (!user || !user.token) return;
     try {
       const date = new Date().toISOString().split('T')[0];
       const [statsRes, workoutsRes, weeklyRes] = await Promise.all([
