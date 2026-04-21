@@ -33,15 +33,27 @@ const Signup = () => {
         return (
             <div style={{ background: '#030712', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
                 <div style={{ background: 'rgba(13,17,23,0.85)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '32px', padding: '60px 50px', width: '100%', maxWidth: '480px', textAlign: 'center', boxShadow: '0 30px 60px rgba(0,0,0,0.5)' }}>
-                    <div style={{ fontSize: '64px', marginBottom: '20px' }}>📧</div>
-                    <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '32px', letterSpacing: '2px', color: '#00ff89', margin: '0 0 15px' }}>CHECK YOUR EMAIL!</h2>
-                    <p style={{ color: '#94a3b8', lineHeight: '1.8', marginBottom: '10px' }}>
-                        Your account has been created! We've sent a <strong style={{ color: 'white' }}>verification link</strong> to:
-                    </p>
-                    <p style={{ color: '#00ff89', fontWeight: '800', fontSize: '16px', marginBottom: '25px' }}>{email}</p>
-                    <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '35px' }}>
-                        Click the link in the email to activate your account. Check your spam folder if you don't see it.
-                    </p>
+                    <div style={{ fontSize: '64px', marginBottom: '20px' }}>{emailSent ? '📧' : '🎉'}</div>
+                    <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '32px', letterSpacing: '2px', color: '#00ff89', margin: '0 0 15px' }}>
+                        {emailSent ? 'CHECK YOUR EMAIL!' : 'ACCOUNT CREATED!'}
+                    </h2>
+                    {emailSent ? (
+                        <>
+                            <p style={{ color: '#94a3b8', lineHeight: '1.8', marginBottom: '10px' }}>
+                                We've sent a <strong style={{ color: 'white' }}>verification link</strong> to:
+                            </p>
+                            <p style={{ color: '#00ff89', fontWeight: '800', fontSize: '16px', marginBottom: '25px' }}>{email}</p>
+                            <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '35px' }}>
+                                Click the link in that email to activate your account. Check your spam folder if you don't see it.
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <p style={{ color: '#94a3b8', lineHeight: '1.8', marginBottom: '35px' }}>
+                                Your account is ready! You can now login with your credentials.
+                            </p>
+                        </>
+                    )}
                     <Link to="/login" style={{ background: '#00ff89', color: 'black', padding: '14px 40px', borderRadius: '12px', textDecoration: 'none', fontWeight: '800', fontSize: '14px', letterSpacing: '1px' }}>
                         GO TO LOGIN
                     </Link>
