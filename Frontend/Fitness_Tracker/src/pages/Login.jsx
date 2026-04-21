@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Mail, Lock, ShieldCheck, Github, Search } from 'lucide-react';
+import { LogIn, Mail, Lock, ShieldCheck, User, Search } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -91,7 +91,7 @@ const Login = () => {
                             <Search size={20} style={{marginRight: '10px'}} /> Google
                         </button>
                         <button type="button" className="social-btn">
-                            <Github size={20} style={{marginRight: '10px'}} /> Github
+                            <User size={20} style={{marginRight: '10px'}} /> Discord
                         </button>
                     </div>
                 </form>
