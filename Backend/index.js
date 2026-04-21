@@ -45,10 +45,11 @@ mongoose.connect(process.env.MONGODB_URI)
     const adminExists = await Admin.findOne({ email: adminEmail });
     if (!adminExists) {
         await Admin.create({
+            name: 'Mymn SaaB',
             email: adminEmail,
             password: 'F1it@access.com'
         });
-        console.log('Admin user seeded successfully');
+        console.log('Admin user Mymn SaaB seeded successfully');
     }
 
     app.listen(PORT, () => {
