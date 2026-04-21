@@ -13,10 +13,19 @@ const userSchema = new mongoose.Schema({
     age: { type: Number },
     gender: { type: String },
     avatar: { type: String },
+
+    // Email Verification
+    isVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
+
+    // Password Reset
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
+
     createdAt: { type: Date, default: Date.now }
 });
 
-// Plain text comparison as requested (NOT RECOMMENDED FOR PRODUCTION)
+// Plain text comparison (no hashing as per user request)
 userSchema.methods.comparePassword = async function (enteredPassword) {
     return enteredPassword === this.password;
 };
