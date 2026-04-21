@@ -10,7 +10,7 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -18,9 +18,8 @@ const Signup = () => {
         setError('');
         setLoading(true);
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/signup', { name, email, password });
-            login(data);
-            navigate('/');
+            await axios.post('http://localhost:5000/api/auth/signup', { name, email, password });
+            setSubmitted(true); // Show success screen: check email
         } catch (err) {
             setError(err.response?.data?.message || 'Error occurred during signup');
         } finally {
@@ -28,105 +27,87 @@ const Signup = () => {
         }
     };
 
-    return (
-        <div className="auth-container premium-dark">
-            <div className="auth-card glassmorphism animate-fade-in">
-                <div className="auth-header">
-                    <div className="auth-logo">
-                         <div className="logo-ring"></div>
-                         <UserPlus size={32} color="var(--accent-green)" />
-                    </div>
-                    <h2 className="bebas-font">JOIN THE ELITE</h2>
-                    <p className="auth-subtitle">Create account to start your transformation</p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="input-group">
-                        <label>FULL NAME</label>
-                        <div className="input-field">
-                            <User size={18} />
-                            <input
-                                type="text"
-                                placeholder="Enter your full name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="input-group">
-                        <label>EMAIL ADDRESS</label>
-                        <div className="input-field">
-                            <Mail size={18} />
-                            <input
-                                type="email"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="input-group">
-                        <label>PASSWORD</label>
-                        <div className="input-field">
-                            <Lock size={18} />
-                            <input
-                                type="password"
-                                placeholder="Create a strong password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    {error && <div className="auth-error">{error}</div>}
-
-                    <button type="submit" className="login-btn" disabled={loading}>
-                        {loading ? 'PROCESSING...' : 'CREATE ACCOUNT'}
-                    </button>
-                    
-                    <div className="divider"><span>OR JOIN WITH EMAIL ABOVE</span></div>
-                </form>
-
-                <div className="auth-footer">
-                    Already a member? <Link to="/login" className="glow-link">Login Here</Link>
+    if (submitted) {
+        return (
+            <div style={{ background: '#030712', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                <div style={{ background: 'rgba(13,17,23,0.85)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '32px', padding: '60px 50px', width: '100%', maxWidth: '480px', textAlign: 'center', boxShadow: '0 30px 60px rgba(0,0,0,0.5)' }}>
+                    <div style={{ fontSize: '64px', marginBottom: '20px' }}>📧</div>
+                    <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '32px', letterSpacing: '2px', color: '#00ff89', margin: '0 0 15px' }}>CHECK YOUR EMAIL!</h2>
+                    <p style={{ color: '#94a3b8', lineHeight: '1.8', marginBottom: '10px' }}>
+                        Your account has been created! We've sent a <strong style={{ color: 'white' }}>verification link</strong> to:
+                    </p>
+                    <p style={{ color: '#00ff89', fontWeight: '800', fontSize: '16px', marginBottom: '25px' }}>{email}</p>
+                    <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '35px' }}>
+                        Click the link in the email to activate your account. Check your spam folder if you don't see it.
+                    </p>
+                    <Link to="/login" style={{ background: '#00ff89', color: 'black', padding: '14px 40px', borderRadius: '12px', textDecoration: 'none', fontWeight: '800', fontSize: '14px', letterSpacing: '1px' }}>
+                        GO TO LOGIN
+                    </Link>
                 </div>
             </div>
+        );
+    }
 
-            <style>{`
-                .premium-dark { background: #030712; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-                .auth-card { background: rgba(13, 17, 23, 0.85); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; padding: 50px; width: 100%; max-width: 450px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
-                .auth-header { text-align: center; margin-bottom: 40px; }
-                .auth-logo { width: 70px; height: 70px; border-radius: 50%; background: rgba(0, 255, 137, 0.05); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid rgba(0, 255, 137, 0.2); position: relative; }
-                .logo-ring { position: absolute; inset: -5px; border: 1px dashed rgba(0, 255, 137, 0.2); border-radius: 50%; animation: spin 10s linear infinite; }
-                @keyframes spin { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
+    return (
+        <div style={{ background: '#030712', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+            <div style={{ background: 'rgba(13,17,23,0.85)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '32px', padding: '50px', width: '100%', maxWidth: '450px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)' }}>
                 
-                .bebas-font { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; color: white; }
-                .auth-subtitle { color: #94a3b8; font-size: 13px; font-weight: 600; }
-                
-                .input-group { margin-bottom: 22px; }
-                .input-group label { display: block; font-size: 11px; font-weight: 800; color: #64748b; letter-spacing: 1px; margin-bottom: 10px; }
-                .input-field { display: flex; align-items: center; background: #080c10; border: 1px solid #1f2937; border-radius: 12px; padding: 0 20px; outline: 1px solid transparent; transition: 0.3s; }
-                .input-field svg { color: #475569; margin-right: 15px; }
-                .input-field input { background: none; border: none; padding: 14px 0; color: white; flex: 1; outline: none; }
-                .input-field:focus-within { border-color: var(--accent-green); outline-color: rgba(0,255,137,0.1); }
-                
-                .login-btn { width: 100%; padding: 16px; background: var(--accent-green); color: black; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-                .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 255, 137, 0.2); }
-                
-                .divider { text-align: center; margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.05); position: relative; }
-                .divider span { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0d1117; padding: 0 15px; font-size: 10px; color: #475569; font-weight: 800; letter-spacing: 1px; }
-                
-                .auth-footer { text-align: center; margin-top: 35px; color: #64748b; font-size: 13px; font-weight: 600; }
-                .glow-link { color: var(--accent-green); text-decoration: none; margin-left: 5px; border-bottom: 1px dashed transparent; transition: 0.3s; }
-                .glow-link:hover { border-color: var(--accent-green); text-shadow: 0 0 10px rgba(0,255,137,0.5); }
-                
-                .auth-error { color: #ef4444; font-size: 12px; font-weight: 600; margin-bottom: 15px; background: rgba(239, 68, 68, 0.05); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.1); }
-            `}</style>
+                <div style={{ textAlign: 'center', marginBottom: '35px' }}>
+                    <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: 'rgba(0,255,137,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', border: '1px solid rgba(0,255,137,0.2)', position: 'relative' }}>
+                        <div style={{ position: 'absolute', inset: '-5px', border: '1px dashed rgba(0,255,137,0.2)', borderRadius: '50%', animation: 'spin 10s linear infinite' }}></div>
+                        <UserPlus size={32} color="#00ff89" />
+                    </div>
+                    <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '36px', letterSpacing: '2px', color: 'white', margin: '0' }}>JOIN THE ELITE</h2>
+                    <p style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '600', marginTop: '5px' }}>Create your account to begin your transformation</p>
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>FULL NAME</label>
+                        <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
+                            <User size={18} color="#475569" style={{ marginRight: '15px' }} />
+                            <input type="text" placeholder="Enter your full name" value={name} onChange={(e) => setName(e.target.value)} required
+                                style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>EMAIL ADDRESS</label>
+                        <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
+                            <Mail size={18} color="#475569" style={{ marginRight: '15px' }} />
+                            <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required
+                                style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>PASSWORD</label>
+                        <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
+                            <Lock size={18} color="#475569" style={{ marginRight: '15px' }} />
+                            <input type="password" placeholder="Create a strong password" value={password} onChange={(e) => setPassword(e.target.value)} required
+                                style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
+                        </div>
+                    </div>
+
+                    {error && (
+                        <div style={{ color: '#ef4444', fontSize: '12px', fontWeight: '600', marginBottom: '15px', background: 'rgba(239,68,68,0.05)', padding: '10px', borderRadius: '8px', textAlign: 'center', border: '1px solid rgba(239,68,68,0.1)' }}>
+                            {error}
+                        </div>
+                    )}
+
+                    <button type="submit" disabled={loading} style={{
+                        width: '100%', padding: '16px', background: '#00ff89', color: 'black',
+                        border: 'none', borderRadius: '12px', fontWeight: '800', fontSize: '14px', cursor: 'pointer', marginTop: '5px'
+                    }}>
+                        {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
+                    </button>
+                </form>
+
+                <div style={{ textAlign: 'center', marginTop: '30px', color: '#64748b', fontSize: '13px', fontWeight: '600' }}>
+                    Already a member? <Link to="/login" style={{ color: '#00ff89', textDecoration: 'none', fontWeight: '800', marginLeft: '5px' }}>Login Here</Link>
+                </div>
+            </div>
+            <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
         </div>
     );
 };
