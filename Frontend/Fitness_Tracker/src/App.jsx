@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import Layout from './components/Layout';
 import './App.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -33,11 +34,11 @@ function App() {
           <Route path="/signup" element={<Signup />} />
 
           {/* Protected User Routes */}
-          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/workouts" element={<ProtectedRoute><Workouts /></ProtectedRoute>} />
-          <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
-          <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+          <Route path="/workouts" element={<ProtectedRoute><Layout><Workouts /></Layout></ProtectedRoute>} />
+          <Route path="/progress" element={<ProtectedRoute><Layout><Progress /></Layout></ProtectedRoute>} />
+          <Route path="/nutrition" element={<ProtectedRoute><Layout><Nutrition /></Layout></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
 
           {/* Protected Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
