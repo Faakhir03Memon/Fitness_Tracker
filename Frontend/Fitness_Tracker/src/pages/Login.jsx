@@ -32,9 +32,23 @@ const Login = () => {
         }
     };
 
-    const handleGoogleLogin = () => {
-        // In a real app, logic for Google OAuth would go here
-        alert("Google Login Integration coming soon! (Requires Client ID configuration)");
+    const handleSocialLogin = async (provider) => {
+        setLoading(true);
+        try {
+            // Simulated social profile data
+            const socialData = {
+                email: `guest_${provider}@example.com`,
+                name: `Social User (${provider})`,
+                provider
+            };
+            const { data } = await axios.post('http://localhost:5000/api/auth/social-login', socialData);
+            login(data);
+            navigate('/');
+        } catch (err) {
+            setError("Social login failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -87,13 +101,13 @@ const Login = () => {
                     <div className="divider"><span>OR CONTINUE WITH</span></div>
                     
                     <div className="social-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px'}}>
-                        <button type="button" className="social-btn" onClick={handleGoogleLogin}>
+                        <button type="button" className="social-btn" onClick={() => handleSocialLogin('google')}>
                             <Search size={18} /> Google
                         </button>
-                        <button type="button" className="social-btn">
+                        <button type="button" className="social-btn" onClick={() => handleSocialLogin('facebook')}>
                             <Globe size={18} /> Facebook
                         </button>
-                        <button type="button" className="social-btn">
+                        <button type="button" className="social-btn" onClick={() => handleSocialLogin('github')}>
                             <Terminal size={18} /> Github
                         </button>
                     </div>

@@ -116,4 +116,37 @@ router.put('/profile', protect, async (req, res) => {
     }
 });
 
+// Social Login (Google/FB/Github) simulation
+router.post('/social-login', async (req, res) => {
+    try {
+        const { email, name, provider } = req.body;
+        
+        let user = await User.findOne({ email });
+        
+        if (!user) {
+            // Create user if not exists
+            user = await User.create({
+                email,
+                name,
+                password: Math.random().toString(36).slice(-8), // Dummy password
+                status: 'active'
+            });
+        }
+
+        if (user.isBanned) {
+            return res.status(403).json({ message: 'Account is banned' });
+        }
+
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            token: generateToken(user._id)
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 module.exports = router;

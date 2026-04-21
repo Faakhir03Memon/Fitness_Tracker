@@ -17,13 +17,30 @@ const Signup = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
-
         try {
             const { data } = await axios.post('http://localhost:5000/api/auth/signup', { name, email, password });
             login(data);
             navigate('/');
         } catch (err) {
             setError(err.response?.data?.message || 'Error occurred during signup');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSocialSignup = async (provider) => {
+        setLoading(true);
+        try {
+            const socialData = {
+                email: `guest_${provider}_${Math.floor(Math.random()*1000)}@example.com`,
+                name: `Social User (${provider})`,
+                provider
+            };
+            const { data } = await axios.post('http://localhost:5000/api/auth/social-login', socialData);
+            login(data);
+            navigate('/');
+        } catch (err) {
+            setError("Social signup failed.");
         } finally {
             setLoading(false);
         }
@@ -93,13 +110,13 @@ const Signup = () => {
                     <div className="divider"><span>OR SIGN UP WITH</span></div>
                     
                     <div className="social-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px'}}>
-                        <button type="button" className="social-btn">
+                        <button type="button" className="social-btn" onClick={() => handleSocialSignup('google')}>
                             <Search size={18} /> Google
                         </button>
-                        <button type="button" className="social-btn">
+                        <button type="button" className="social-btn" onClick={() => handleSocialSignup('facebook')}>
                             <Globe size={18} /> Facebook
                         </button>
-                        <button type="button" className="social-btn">
+                        <button type="button" className="social-btn" onClick={() => handleSocialSignup('github')}>
                             <Terminal size={18} /> Github
                         </button>
                     </div>
@@ -111,7 +128,6 @@ const Signup = () => {
             </div>
 
             <style>{`
-                /* Reuse same premium auth styles from Login.jsx */
                 .premium-dark { background: #030712; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
                 .auth-card { background: rgba(13, 17, 23, 0.8); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; padding: 50px; width: 100%; max-width: 450px; }
                 .auth-header { text-align: center; margin-bottom: 40px; }
@@ -145,7 +161,7 @@ const Signup = () => {
                 
                 .auth-error { color: #ef4444; font-size: 12px; font-weight: 600; margin-bottom: 15px; background: rgba(239, 68, 68, 0.05); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.1); }
             `}</style>
-        </div>
+       </div>
     );
 };
 
