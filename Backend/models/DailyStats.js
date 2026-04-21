@@ -14,6 +14,10 @@ const dailyStatsSchema = new mongoose.Schema({
   water: { type: Number, default: 0 },
   caloriesBurned: { type: Number, default: 0 },
   activeMinutes: { type: Number, default: 0 },
+  totalProtein: { type: Number, default: 0 },
+  totalCarbs: { type: Number, default: 0 },
+  totalFats: { type: Number, default: 0 },
+  totalCaloriesIn: { type: Number, default: 0 },
   weight: { type: Number },
 });
 
