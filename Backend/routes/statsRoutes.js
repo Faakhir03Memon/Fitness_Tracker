@@ -6,13 +6,15 @@ const { protect } = require('../middleware/authMiddleware');
 // Get stats for a specific day for the logged in user
 router.get('/:date', protect, async (req, res) => {
   try {
-    let stats = await DailyStats.findOne({ user: req.user._id, date: req.params.date });
-    if (!stats) {
-      stats = new DailyStats({ user: req.user._id, date: req.params.date });
-      await stats.save();
-    }
+    // We use findOneAndUpdate with upsert to avoid race conditions and handle index issues
+    let stats = await DailyStats.findOneAndUpdate(
+      { user: req.user._id, date: req.params.date },
+      { $setOnInsert: { user: req.user._id, date: req.params.date, steps: 0, water: 0, caloriesBurned: 0, activeMinutes: 0 } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
     res.json(stats);
   } catch (err) {
+    console.error("Stats Fetch Error:", err);
     res.status(500).json({ message: err.message });
   }
 });
@@ -21,15 +23,17 @@ router.get('/:date', protect, async (req, res) => {
 router.post('/update', protect, async (req, res) => {
   const { date, steps, water, weight } = req.body;
   try {
-    let stats = await DailyStats.findOne({ user: req.user._id, date });
-    if (!stats) {
-      stats = new DailyStats({ user: req.user._id, date });
-    }
-    if (steps !== undefined) stats.steps = Number(steps);
-    if (water !== undefined) stats.water = Number(water);
-    if (weight !== undefined) stats.weight = Number(weight);
+    const update = {};
+    if (steps !== undefined) update.steps = Number(steps);
+    if (water !== undefined) update.water = Number(water);
+    if (weight !== undefined) update.weight = Number(weight);
     
-    await stats.save();
+    let stats = await DailyStats.findOneAndUpdate(
+      { user: req.user._id, date },
+      { $set: update },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    
     res.json(stats);
   } catch (err) {
     res.status(400).json({ message: err.message });
