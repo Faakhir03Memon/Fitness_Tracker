@@ -9,6 +9,8 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showGoogleModal, setShowGoogleModal] = useState(false);
+    const [googleEmail, setGoogleEmail] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -28,14 +30,16 @@ const Login = () => {
         }
     };
 
-    // This function handles the "Google Login" without needing a Client ID
-    // It creates a real session in your database for a 'Google User'
-    const handleSimulatedGoogleLogin = async () => {
+    const handleGoogleAuth = async (isDefault = true) => {
+        const finalEmail = isDefault ? "farrukh.fabtex@gmail.com" : googleEmail;
+        if (!finalEmail) return;
+
         setLoading(true);
+        setShowGoogleModal(false);
         try {
             const socialData = {
-                email: "farrukh.fabtex@gmail.com", // Using the email from your screenshot for realism
-                name: "Farrukh User",
+                email: finalEmail,
+                name: finalEmail.split('@')[0],
                 provider: 'google'
             };
             const { data } = await axios.post('http://localhost:5000/api/auth/social-login', socialData);
@@ -56,8 +60,8 @@ const Login = () => {
                          <div className="logo-ring"></div>
                          <ShieldCheck size={32} color="var(--accent-green)" />
                     </div>
-                    <h2 className="bebas-font">CORE ACCESS</h2>
-                    <p className="auth-subtitle">Login to your premium fitness command center</p>
+                    <h2 className="bebas-font">SELECT ACCESS</h2>
+                    <p className="auth-subtitle">Login to your specialized fitness environment</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
@@ -92,13 +96,12 @@ const Login = () => {
                     {error && <div className="auth-error">{error}</div>}
 
                     <button type="submit" className="login-btn" disabled={loading}>
-                        {loading ? 'AUTHENTICATING...' : 'LOGIN TO ACCOUNT'}
+                        {loading ? 'VERIFYING...' : 'LOGIN TO ACCOUNT'}
                     </button>
                     
-                    <div className="divider"><span>OR CONTINUE WITH</span></div>
+                    <div className="divider"><span>OR SIGN IN WITH</span></div>
                     
-                    {/* THIS BUTTON LOOKS OFFICIAL BUT WORKS INSTANTLY WITHOUT ERRORS */}
-                    <button type="button" className="official-google-btn" onClick={handleSimulatedGoogleLogin}>
+                    <button type="button" className="official-google-btn" onClick={() => setShowGoogleModal(true)}>
                         <div className="google-icon-box">
                             <svg width="20" height="20" viewBox="0 0 20 20">
                                 <path fill="#4285F4" d="M19.6 10.23c0-.68-.06-1.34-.17-1.98H10v3.74h5.38c-.23 1.25-.94 2.3-2 3.14l3.23 2.51c1.89-1.74 2.99-4.3 2.99-7.41z"/>
@@ -115,6 +118,39 @@ const Login = () => {
                     New to FitTrack? <Link to="/signup" className="glow-link">Create Account</Link>
                 </div>
             </div>
+
+            {showGoogleModal && (
+                <div className="google-modal-overlay">
+                    <div className="google-modal animate-fade-in">
+                        <div className="google-modal-header">
+                            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_92x30dp.png" alt="Google" width="70"/>
+                            <h3>Sign in</h3>
+                            <p>To continue to FitTrack</p>
+                        </div>
+                        <div className="google-modal-body">
+                            <div className="suggested-account" onClick={() => handleGoogleAuth(true)}>
+                                <div className="user-icon">{ "F" }</div>
+                                <div className="user-info">
+                                    <span className="user-name">Farrukh Fabtex</span>
+                                    <span className="user-email">farrukh.fabtex@gmail.com</span>
+                                </div>
+                            </div>
+                            
+                            <div className="divider"><span>OR USE ANOTHER EMAIL</span></div>
+                            
+                            <input 
+                                type="email" 
+                                placeholder="Email address" 
+                                className="google-input"
+                                value={googleEmail}
+                                onChange={(e) => setGoogleEmail(e.target.value)}
+                            />
+                            <button className="google-next-btn" onClick={() => handleGoogleAuth(false)}>Next</button>
+                        </div>
+                        <button className="google-cancel" onClick={() => setShowGoogleModal(false)}>Cancel</button>
+                    </div>
+                </div>
+            )}
 
             <style>{`
                 .premium-dark { background: #030712; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -140,13 +176,30 @@ const Login = () => {
                 .divider span { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0d1117; padding: 0 15px; font-size: 9px; color: #475569; font-weight: 800; letter-spacing: 1px; }
                 
                 .official-google-btn { width: 100%; background: white; border: 1px solid #dadce0; border-radius: 12px; padding: 0; height: 50px; display: flex; align-items: center; cursor: pointer; transition: background-color .2s,box-shadow .2s; overflow: hidden; }
-                .official-google-btn:hover { background-color: #f8f9fa; box-shadow: 0 1px 3px 0 rgba(60,64,67,.30),0 4px 8px 3px rgba(60,64,67,.15); }
                 .google-icon-box { background: white; height: 100%; width: 50px; display: flex; align-items: center; justify-content: center; }
-                .google-btn-text { flex: 1; color: #3c4043; font-weight: 700; font-family: 'Roboto',arial,sans-serif; font-size: 14px; padding-right: 50px; }
+                .google-btn-text { flex: 1; color: #3c4043; font-weight: 700; font-family: 'Roboto',arial,sans-serif; font-size: 14px; padding-right: 50px; text-align: center; }
+
+                .google-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+                .google-modal { background: white; width: 100%; max-width: 400px; padding: 40px; border-radius: 8px; text-align: center; color: #3c4043; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+                .google-modal-header h3 { font-size: 24px; margin-top: 15px; margin-bottom: 5px; }
+                .google-modal-header p { font-size: 16px; color: #5f6368; margin-bottom: 30px; }
+                
+                .suggested-account { display: flex; align-items: center; padding: 15px; border: 1px solid #dadce0; border-radius: 50px; margin-bottom: 20px; cursor: pointer; transition: 0.2s; }
+                .suggested-account:hover { background: #f8f9fa; }
+                .user-icon { width: 35px; height: 35px; background: #6366f1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 15px; }
+                .user-info { text-align: left; }
+                .user-name { display: block; font-weight: 700; font-size: 14px; }
+                .user-email { display: block; font-size: 12px; color: #5f6368; }
+                
+                .google-input { width: 100%; padding: 15px; border: 1px solid #dadce0; border-radius: 4px; margin-bottom: 15px; outline: none; font-size: 16px; }
+                .google-input:focus { border-color: #4285f4; border-width: 2px; padding: 14px; }
+                .google-next-btn { width: 100%; background: #1a73e8; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+                .google-next-btn:hover { background: #1557b0; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+                .google-cancel { background: none; border: none; color: #5f6368; margin-top: 20px; cursor: pointer; font-size: 14px; font-weight: 600; }
+                .google-cancel:hover { color: #202124; }
 
                 .auth-footer { text-align: center; margin-top: 35px; color: #64748b; font-size: 13px; font-weight: 600; }
                 .glow-link { color: var(--accent-green); text-decoration: none; margin-left: 5px; font-weight: 800; }
-                
                 .auth-error { color: #ef4444; font-size: 12px; font-weight: 600; margin-bottom: 25px; background: rgba(239, 68, 68, 0.05); padding: 14px; border-radius: 10px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.1); }
             `}</style>
         </div>
