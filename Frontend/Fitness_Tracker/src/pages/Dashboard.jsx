@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, Flame, Clock, Footprints, Droplets } from 'lucide-react';
+import { Plus, Flame, Clock, Footprints, Droplets, Target, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
@@ -35,17 +35,15 @@ const Dashboard = () => {
       ]);
 
       setStats({
-        calories: statsRes.data.caloriesBurned || 847,
-        minutes: statsRes.data.activeMinutes || 48,
-        steps: statsRes.data.steps || 7342,
-        water: statsRes.data.water || 1.8
+        calories: statsRes.data.caloriesBurned || 0,
+        minutes: statsRes.data.activeMinutes || 0,
+        steps: statsRes.data.steps || 0,
+        water: statsRes.data.water || 0
       });
       setWorkouts(workoutsRes.data.slice(0, 3));
       
-      // Map weekly data or use defaults
       const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      const defaultHeights = [80, 60, 90, 45, 70, 55, 100];
-      setWeeklyBars(days.map((d, i) => ({ day: d, height: defaultHeights[i] })));
+      setWeeklyBars(days.map((d, i) => ({ day: d, height: Math.floor(Math.random() * 80) + 20 })));
 
     } catch (err) {
       console.error("Error fetching dashboard data", err);
@@ -67,68 +65,73 @@ const Dashboard = () => {
     <main className="main">
       <div className="topbar">
         <div className="greeting">
-          <h1>GOOD MORNING, {user?.name?.split(' ')[0].toUpperCase()}</h1>
+          <h1>WELCOME, {user?.name?.split(' ')[0].toUpperCase()}</h1>
           <p>{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>
         <div className="topbar-right">
           <div className="streak-badge">
-            <div className="streak-dot"></div>
-            14-Day Streak
+             <div className="streak-dot"></div>
+             Active Session
           </div>
-          <div className="avatar">{user?.name?.charAt(0) || 'U'}</div>
+          <div className="avatar" style={{ marginLeft: '10px' }}>{user?.name?.charAt(0) || 'U'}</div>
         </div>
       </div>
 
-      <div className="section-label">Today's Stats</div>
+      <div className="section-label"><Activity size={16} style={{marginRight: '8px'}} /> PERFORMANCE METRICS</div>
       <div className="stats-grid">
-        <StatCard label="Calories Burned" value={stats.calories} unit="kcal today" color="var(--accent-green)" icon={<Flame size={20} />} trend="+12%" />
-        <StatCard label="Active Minutes" value={stats.minutes} unit="min of 60 goal" color="var(--accent-cyan)" icon={<Clock size={20} />} trend="+8%" />
-        <StatCard label="Steps" value={stats.steps} unit="of 10,000 goal" color="var(--accent-purple)" icon={<Footprints size={20} />} trend="+5%" />
-        <StatCard label="Water Intake" value={stats.water} unit="L of 3L goal" color="var(--accent-orange)" icon={<Droplets size={20} />} trend="-3%" isDown={true} />
+        <StatCard label="Calories Burned" value={stats.calories} unit="kcal" color="var(--accent-green)" icon={<Flame size={20} />} trend="+12%" />
+        <StatCard label="Active Minutes" value={stats.minutes} unit="min" color="var(--accent-cyan)" icon={<Clock size={20} />} trend="+8%" />
+        <StatCard label="Steps Taken" value={stats.steps} unit="steps" color="var(--accent-purple)" icon={<Footprints size={20} />} trend="+5%" />
+        <StatCard label="Water Intake" value={stats.water} unit="Liters" color="var(--accent-orange)" icon={<Droplets size={20} />} trend="-3%" isDown={true} />
       </div>
 
       <div className="mid-grid">
         <div className="progress-section">
-          <div className="section-header">
-            <div className="section-title">WEEKLY WORKOUT INTENSITY</div>
-            <div className="section-tag">This Week</div>
+          <div className="section-header" style={{display: 'flex', justifyContent: 'space-between', marginBottom: '20px'}}>
+             <div className="section-title" style={{fontFamily: 'Bebas Neue', fontSize: '20px', letterSpacing: '1px'}}>WEEKLY ACTIVITY INTENSITY</div>
+             <div className="section-tag" style={{fontSize: '12px', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '20px'}}>Performance</div>
           </div>
           <div className="weekly-bars">
             {weeklyBars.map((b, i) => (
               <div key={i} className="day-col">
                 <div className="day-bar-wrap">
-                  <div className={`day-bar ${i === 0 ? 'today' : ''}`} style={{ height: `${b.height}%` }}></div>
+                  <div className="day-bar" style={{ height: `${b.height}%` }}></div>
                 </div>
-                <div className={`day-label ${i === 0 ? 'today' : ''}`}>{b.day}</div>
+                <div className="day-label" style={{fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600'}}>{b.day}</div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="goals-panel">
-          <div className="section-header">
-            <div className="section-title">GOALS</div>
-            <div className="section-tag">Monthly</div>
+        <div className="progress-section" style={{background: '#0d1117'}}>
+          <div className="section-header" style={{display: 'flex', justifyContent: 'space-between', marginBottom: '25px'}}>
+             <div className="section-title" style={{fontFamily: 'Bebas Neue', fontSize: '20px', letterSpacing: '1px'}}>MONTHLY GOALS STATUS</div>
+             <Target size={20} color="var(--text-muted)" />
           </div>
           <GoalItem name="Weight Loss" pct={72} color="var(--accent-green)" />
           <GoalItem name="Muscle Gain" pct={58} color="var(--accent-cyan)" />
           <GoalItem name="Endurance" pct={85} color="var(--accent-purple)" />
+          <GoalItem name="Flexibility" pct={40} color="var(--accent-orange)" />
         </div>
       </div>
 
-      <div className="section-label">Recent Activities</div>
-      <div className="workout-grid">
-        {workouts.map((w, i) => (
-          <WorkoutCard key={i} workout={w} />
-        ))}
+      <div className="section-label">RECENT ACTIVITIES</div>
+      <div className="workout-grid" style={{marginTop: '20px'}}>
+        {workouts.length > 0 ? workouts.map((w, i) => (
+           <WorkoutCard key={i} workout={w} />
+        )) : (
+          <div className="workout-card" style={{gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-muted)'}}>
+             No activities logged yet starts by clicking the + button.
+          </div>
+        )}
       </div>
 
       <button className="add-btn" onClick={() => setIsModalOpen(true)}>
-        <Plus />
+        <Plus size={32} />
       </button>
 
       {isModalOpen && (
-        <div className="modal-overlay open">
+        <div className="modal-overlay">
           <div className="modal">
             <h2 className="modal-title">Log Workout</h2>
             <div className="form-group">
@@ -141,19 +144,19 @@ const Dashboard = () => {
                 <option>Yoga</option>
               </select>
             </div>
-            <div className="form-row">
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>
               <div className="form-group">
                 <label className="form-label">Duration (mins)</label>
-                <input type="number" className="form-input" value={newWorkout.duration} onChange={(e) => setNewWorkout({...newWorkout, duration: e.target.value})} />
+                <input type="number" className="form-input" value={newWorkout.duration} onChange={(e) => setNewWorkout({...newWorkout, duration: e.target.value})} placeholder="0" />
               </div>
               <div className="form-group">
                 <label className="form-label">Calories</label>
-                <input type="number" className="form-input" value={newWorkout.calories} onChange={(e) => setNewWorkout({...newWorkout, calories: e.target.value})} />
+                <input type="number" className="form-input" value={newWorkout.calories} onChange={(e) => setNewWorkout({...newWorkout, calories: e.target.value})} placeholder="0" />
               </div>
             </div>
             <div className="modal-btns">
               <button className="btn-cancel" onClick={() => setIsModalOpen(false)}>Cancel</button>
-              <button className="btn-primary" onClick={handleSaveWorkout} style={{ flex: 1 }}>Save</button>
+              <button className="btn-primary" onClick={handleSaveWorkout}>Save Workout</button>
             </div>
           </div>
         </div>
@@ -164,32 +167,47 @@ const Dashboard = () => {
 
 const StatCard = ({ label, value, unit, color, icon, trend, isDown }) => (
   <div className="stat-card" style={{ '--accent-color-solid': color }}>
-    <div className="stat-label">{label}</div>
+    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
+        <div className="stat-label">{label}</div>
+        <div style={{color}}>{icon}</div>
+    </div>
     <div className="stat-value">{value.toLocaleString()}</div>
-    <div className="stat-unit">{unit}</div>
-    <div className={`stat-trend ${isDown ? 'down' : ''}`}>{trend}</div>
+    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px'}}>
+        <div className="stat-unit">{unit}</div>
+        <div style={{fontSize: '12px', fontWeight: '700', color: isDown ? '#f87171' : '#4ade80'}}>
+            {trend}
+        </div>
+    </div>
   </div>
 );
 
 const GoalItem = ({ name, pct, color }) => (
-  <div className="goal-item" style={{ marginBottom: '22px' }}>
-    <div className="goal-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-      <span className="goal-name" style={{ fontSize: '13px', fontWeight: '600' }}>{name}</span>
-      <span className="goal-pct" style={{ color, fontFamily: 'Bebas Neue', fontSize: '18px' }}>{pct}%</span>
+  <div className="goal-item">
+    <div className="goal-header">
+      <span className="goal-name">{name}</span>
+      <span className="goal-pct" style={{ color }}>{pct}%</span>
     </div>
-    <div className="goal-bar" style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px' }}>
-      <div className="goal-fill" style={{ width: `${pct}%`, background: color, height: '100%', borderRadius: '10px' }}></div>
+    <div className="goal-bar-bg">
+      <div className="goal-bar-fill" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}66, ${color})` }}></div>
     </div>
   </div>
 );
 
 const WorkoutCard = ({ workout }) => (
   <div className="workout-card">
-    <div className="wc-title">{workout.type}</div>
-    <div className="wc-meta">{new Date(workout.date).toLocaleDateString()}</div>
-    <div className="wc-stats">
-      <div className="wc-stat"><div className="n">{workout.duration}</div><div className="u">Mins</div></div>
-      <div className="wc-stat"><div className="n">{workout.calories}</div><div className="u">Kcal</div></div>
+    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
+        <div className="wc-title" style={{fontFamily: 'Bebas Neue', fontSize: '20px', letterSpacing: '1px'}}>{workout.type}</div>
+        <div style={{fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600'}}>{new Date(workout.date).toLocaleDateString()}</div>
+    </div>
+    <div style={{display: 'flex', gap: '20px', marginBottom: '10px'}}>
+      <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+          <Clock size={14} color="var(--accent-green)" />
+          <span style={{fontSize: '13px', fontWeight: '600'}}>{workout.duration} min</span>
+      </div>
+      <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+          <Flame size={14} color="var(--accent-orange)" />
+          <span style={{fontSize: '13px', fontWeight: '600'}}>{workout.calories} kcal</span>
+      </div>
     </div>
   </div>
 );
