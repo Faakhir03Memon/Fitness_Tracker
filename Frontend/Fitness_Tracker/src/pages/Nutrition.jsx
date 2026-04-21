@@ -148,9 +148,9 @@ const Nutrition = () => {
 
             <div className="diet-log-section">
                 <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
-                    <div className="section-label">TODAY'S MEALS</div>
-                    <button className="premium-btn edit" onClick={() => setIsAdding(!isAdding)}>
-                        {isAdding ? 'Close Search' : <><Plus size={18} /> Log Food</>}
+                    <div className="section-label">TODAY'S MEAL HISTORY</div>
+                    <button className={isAdding ? "btn-cancel" : "btn-primary"} onClick={() => setIsAdding(!isAdding)} style={{width: 'auto', padding: '10px 25px', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                        {isAdding ? 'CLOSE SEARCH' : <><Plus size={18} /> LOG FOOD</>}
                     </button>
                 </div>
 
