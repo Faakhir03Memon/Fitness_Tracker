@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, Flame, Clock, Footprints, Droplets } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
-const Dashboard = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     calories: 0,
     minutes: 0,
@@ -15,6 +16,10 @@ const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newWorkout, setNewWorkout] = useState({ type: '', duration: '', calories: '', notes: '' });
 
+  const authConfig = {
+    headers: { Authorization: `Bearer ${user.token}` }
+  };
+
   useEffect(() => {
     fetchInitialData();
   }, []);
@@ -23,9 +28,9 @@ const Dashboard = () => {
     try {
       const date = new Date().toISOString().split('T')[0];
       const [statsRes, workoutsRes, weeklyRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/stats/${date}`),
-        axios.get('http://localhost:5000/api/workouts'),
-        axios.get('http://localhost:5000/api/stats/range/weekly')
+        axios.get(`http://localhost:5000/api/stats/${date}`, authConfig),
+        axios.get('http://localhost:5000/api/workouts', authConfig),
+        axios.get('http://localhost:5000/api/stats/range/weekly', authConfig)
       ]);
 
       setStats({
@@ -48,7 +53,7 @@ const Dashboard = () => {
 
   const handleSaveWorkout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/workouts', newWorkout);
+      await axios.post('http://localhost:5000/api/workouts', newWorkout, authConfig);
       setIsModalOpen(false);
       setNewWorkout({ type: '', duration: '', calories: '', notes: '' });
       fetchInitialData();
@@ -61,7 +66,7 @@ const Dashboard = () => {
     <main className="main">
       <div className="topbar">
         <div className="greeting">
-          <h1>GOOD MORNING, ALI</h1>
+          <h1>GOOD MORNING, {user?.name?.split(' ')[0].toUpperCase()}</h1>
           <p>{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>
         <div className="topbar-right">
@@ -69,7 +74,7 @@ const Dashboard = () => {
             <div className="streak-dot"></div>
             14-Day Streak
           </div>
-          <div className="avatar">AL</div>
+          <div className="avatar">{user?.name?.charAt(0) || 'U'}</div>
         </div>
       </div>
 
