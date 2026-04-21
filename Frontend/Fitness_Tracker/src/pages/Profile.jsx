@@ -1,7 +1,33 @@
-import React from 'react';
-import { Camera, Settings, Shield, Bell, Trophy } from 'lucide-react';
+import React, { useState } from 'react';
+import { Camera, Settings, Shield, Bell, Trophy, LogOut, Save, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const Profile = () => {
+  const { user, login, logout } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    password: ''
+  });
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${user.token}` }
+      };
+      const { data } = await axios.put('http://localhost:5000/api/auth/profile', formData, config);
+      login(data);
+      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setIsEditing(false);
+    } catch (err) {
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Update failed' });
+    }
+  };
+
   return (
     <main className="main">
       <div className="topbar">
@@ -9,40 +35,92 @@ const Profile = () => {
           <h1>Account Settings</h1>
           <p>Manage your profile and preferences</p>
         </div>
-        <div className="topbar-right">
-          <button className="btn-primary" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Settings size={18} /> Edit Profile
+        <div className="topbar-right" style={{ display: 'flex', gap: '12px' }}>
+          {!isEditing ? (
+            <button className="btn-primary" onClick={() => setIsEditing(true)} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <Settings size={18} /> Edit Profile
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={() => setIsEditing(false)} style={{ display: 'flex', gap: '8px', alignItems: 'center', background: '#334155' }}>
+              <X size={18} /> Cancel
+            </button>
+          )}
+          <button className="btn-primary" onClick={logout} style={{ display: 'flex', gap: '8px', alignItems: 'center', background: '#ef4444' }}>
+            <LogOut size={18} /> Logout
           </button>
         </div>
       </div>
 
+      {message.text && (
+        <div style={{ 
+          padding: '12px', 
+          borderRadius: '8px', 
+          marginBottom: '20px', 
+          background: message.type === 'success' ? '#064e3b' : '#450a0a',
+          color: message.type === 'success' ? '#10b981' : '#f87171',
+          border: `1px solid ${message.type === 'success' ? '#065f46' : '#7f1d1d'}`
+        }}>
+          {message.text}
+        </div>
+      )}
+
       <div className="progress-section" style={{ marginBottom: '32px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap' }}>
           <div style={{ position: 'relative' }}>
             <div className="avatar" style={{ width: '120px', height: '120px', fontSize: '42px', boxShadow: '0 0 40px rgba(0,255,135,0.2)' }}>
-              AL
+              {user?.name?.charAt(0) || 'U'}
             </div>
             <button style={{ position: 'absolute', bottom: '5px', right: '5px', background: '#fff', border: 'none', borderRadius: '50%', padding: '6px', cursor: 'pointer' }}>
               <Camera size={16} color="#000" />
             </button>
           </div>
-          <div>
-            <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '36px', letterSpacing: '2px' }}>ALI AHMED</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>Member since April 2024 &nbsp;|&nbsp; Pro Athlete Plan</p>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <span className="section-tag" style={{ border: '1px solid var(--accent-green)', color: 'var(--accent-green)' }}>Verified</span>
-              <span className="section-tag">Week 4 Streak</span>
+          
+          {isEditing ? (
+            <form onSubmit={handleUpdate} style={{ flex: 1, minWidth: '300px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                <div className="form-group">
+                  <label style={{ display: 'block', color: 'var(--text-muted)', marginBottom: '5px', fontSize: '0.8rem' }}>Full Name</label>
+                  <input 
+                    type="text" 
+                    value={formData.name} 
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    style={{ width: '100%', background: '#1e293b', border: '1px solid #334155', color: 'white', padding: '10px', borderRadius: '6px' }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label style={{ display: 'block', color: 'var(--text-muted)', marginBottom: '5px', fontSize: '0.8rem' }}>Email</label>
+                  <input 
+                    type="email" 
+                    value={formData.email} 
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    style={{ width: '100%', background: '#1e293b', border: '1px solid #334155', color: 'white', padding: '10px', borderRadius: '6px' }}
+                  />
+                </div>
+              </div>
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', color: 'var(--text-muted)', marginBottom: '5px', fontSize: '0.8rem' }}>New Password (Leave blank to keep current)</label>
+                <input 
+                  type="password" 
+                  value={formData.password} 
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  style={{ width: '100%', background: '#1e293b', border: '1px solid #334155', color: 'white', padding: '10px', borderRadius: '6px' }}
+                />
+              </div>
+              <button type="submit" className="btn-primary" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <Save size={18} /> Save Changes
+              </button>
+            </form>
+          ) : (
+            <div>
+              <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '36px', letterSpacing: '2px' }}>{user?.name?.toUpperCase()}</h2>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>{user?.email} &nbsp;|&nbsp; {user?.role === 'admin' ? 'Administrator' : 'Fitness Enthusiast'}</p>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <span className="section-tag" style={{ border: '1px solid var(--accent-green)', color: 'var(--accent-green)' }}>Verified</span>
+                <span className="section-tag">Active Member</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
-      </div>
-
-      <div className="section-label">Personal Best Benchmarks</div>
-      <div className="stats-grid">
-        <BenchmarkCard icon={<Trophy size={20} />} title="Deadlift" value="185kg" date="Set on 12 April" color="var(--accent-purple)" />
-        <BenchmarkCard icon={<Trophy size={20} />} title="Bench Press" value="120kg" date="Set on 05 April" color="var(--accent-cyan)" />
-        <BenchmarkCard icon={<Trophy size={20} />} title="Squat" value="145kg" date="Set on 28 March" color="var(--accent-green)" />
-        <BenchmarkCard icon={<Trophy size={20} />} title="5K Run" value="22:15" date="Set on 15 March" color="var(--accent-orange)" />
       </div>
 
       <div className="section-label">General Settings</div>
@@ -50,20 +128,13 @@ const Profile = () => {
         <SettingsItem icon={<Shield size={20} />} title="Privacy & Security" desc="Manage data sharing and account security" />
         <SettingsItem icon={<Bell size={20} />} title="Notifications" desc="Configure alert preferences for workouts" />
       </div>
+
+      <style>{`
+        input:focus { outline: none; border-color: var(--accent-green) !important; }
+      `}</style>
     </main>
   );
 };
-
-const BenchmarkCard = ({ icon, title, value, date, color }) => (
-  <div className="stat-card" style={{ '--accent-color-solid': color }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-       <div className="stat-label">{title}</div>
-       {icon}
-    </div>
-    <div className="stat-value" style={{ fontSize: '42px' }}>{value}</div>
-    <div className="stat-unit">{date}</div>
-  </div>
-);
 
 const SettingsItem = ({ icon, title, desc }) => (
   <div className="workout-card" style={{ cursor: 'pointer' }}>
