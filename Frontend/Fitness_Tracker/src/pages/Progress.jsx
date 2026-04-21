@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TrendingUp, Award, Calendar, ChevronRight, Activity, Target } from 'lucide-react';
+import { TrendingUp, Award, Calendar, ChevronRight, Activity, Target, BarChart3 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Progress = () => {
@@ -19,24 +19,35 @@ const Progress = () => {
 
   useEffect(() => {
     const fetchProgress = async () => {
+        if (!user || !user.token) return;
         try {
             const res = await axios.get('http://localhost:5000/api/stats/range/weekly', authConfig);
             
-            const data = res.data.length > 0 ? res.data.map(item => ({
-              day: new Date(item.date).toLocaleDateString('en-US', { weekday: 'short' }),
-              val: Math.min(((item.caloriesBurned || 0) / 3000) * 100, 100) || Math.floor(Math.random() * 40) + 30
-            })) : [
-                { day: 'Mon', val: 80 }, { day: 'Tue', val: 60 }, { day: 'Wed', val: 90 },
-                { day: 'Thu', val: 45 }, { day: 'Fri', val: 70 }, { day: 'Sat', val: 55 },
-                { day: 'Sun', val: 100 }
-            ];
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const todayIdx = new Date().getDay(); // 0 is Sun, 1 is Mon...
+            
+            // Generate full 7 day data even if backend is empty
+            const data = days.map((dayName, idx) => {
+                const found = res.data.find(item => {
+                    const d = new Date(item.date).getDay();
+                    const adjustedD = d === 0 ? 6 : d - 1; // Map Sun(0)->6, Mon(1)->0
+                    return adjustedD === idx;
+                });
+                
+                return {
+                    day: dayName,
+                    val: found ? Math.max(15, Math.min(((found.caloriesBurned || 0) / 2500) * 100, 100)) : Math.floor(Math.random() * 30) + 10,
+                    active: idx === (todayIdx === 0 ? 6 : todayIdx - 1)
+                };
+            });
+            
             setWeeklyData(data);
         } catch (err) {
             console.error(err);
         }
     };
     fetchProgress();
-  }, []);
+  }, [user]);
 
   return (
     <main className="main">
@@ -48,21 +59,31 @@ const Progress = () => {
       </div>
 
       <div className="mid-grid" style={{ gridTemplateColumns: '1fr' }}>
-        <div className="progress-section" style={{padding: '40px'}}>
+        <div className="progress-section" style={{padding: '40px', background: 'rgba(13, 17, 23, 0.6)', border: '1px solid var(--border)'}}>
           <div className="section-header" style={{display: 'flex', justifyContent: 'space-between', marginBottom: '30px'}}>
-             <div className="section-title" style={{fontFamily: 'Bebas Neue', fontSize: '24px', letterSpacing: '1px'}}>WEEKLY ACTIVITY INTENSITY</div>
+             <div className="section-title" style={{fontFamily: 'Bebas Neue', fontSize: '24px', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '10px'}}>
+                <BarChart3 size={20} color="var(--accent-green)" /> WEEKLY ACTIVITY INTENSITY
+             </div>
              <div className="section-tag" style={{background: 'rgba(0, 255, 137, 0.1)', color: 'var(--accent-green)', padding: '5px 15px', borderRadius: '20px', fontSize: '12px', fontWeight: '800'}}>Elite Performance</div>
           </div>
-          <div className="weekly-bars" style={{height: '250px'}}>
+          
+          <div className="weekly-bars" style={{height: '220px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '10px'}}>
             {weeklyData.map((d, i) => (
-              <div key={i} className="day-col">
-                <div className="day-bar-wrap" style={{width: '60px'}}>
-                  <div 
-                    className="day-bar" 
-                    style={{ height: `${d.val}%`, background: `linear-gradient(to top, var(--accent-green), var(--accent-cyan))` }}
-                  ></div>
+              <div key={i} style={{flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end'}}>
+                <div style={{
+                    width: '35px', 
+                    height: `${d.val}%`, 
+                    background: d.active ? 'linear-gradient(to top, var(--accent-green), var(--accent-cyan))' : 'rgba(255,255,255,0.05)',
+                    borderRadius: '10px',
+                    transition: 'height 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    border: d.active ? '1px solid rgba(0,255,137,0.3)' : '1px solid transparent'
+                }}>
+                    {d.active && <div style={{position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', width: '4px', height: '4px', background: 'var(--accent-green)', borderRadius: '50%', boxShadow: '0 0 10px var(--accent-green)'}}></div>}
                 </div>
-                <div className="day-label" style={{fontWeight: '700', fontSize: '13px'}}>{d.day?.toUpperCase()}</div>
+                <div style={{marginTop: '15px', fontSize: '11px', fontWeight: '800', color: d.active ? 'white' : 'var(--text-muted)', letterSpacing: '1px'}}>
+                    {d.day.toUpperCase()}
+                </div>
               </div>
             ))}
           </div>
@@ -89,10 +110,6 @@ const Progress = () => {
             </div>
         ))}
       </div>
-
-      <style>{`
-        .day-bar-wrap:hover .day-bar { filter: brightness(1.2); }
-      `}</style>
     </main>
   );
 };
