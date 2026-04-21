@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Plus, Flame, Clock, Footprints, Droplets } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+const Dashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState({
     calories: 0,
