@@ -4,26 +4,45 @@ import { Plus, Flame, Clock, Footprints, Droplets } from 'lucide-react';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
-    calories: 847,
-    minutes: 48,
-    steps: 7342,
-    water: 1.8
+    calories: 0,
+    minutes: 0,
+    steps: 0,
+    water: 0
   });
 
   const [workouts, setWorkouts] = useState([]);
+  const [weeklyBars, setWeeklyBars] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newWorkout, setNewWorkout] = useState({ type: '', duration: '', calories: '', notes: '' });
 
   useEffect(() => {
-    fetchWorkouts();
+    fetchInitialData();
   }, []);
 
-  const fetchWorkouts = async () => {
+  const fetchInitialData = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/workouts');
-      setWorkouts(res.data);
+      const date = new Date().toISOString().split('T')[0];
+      const [statsRes, workoutsRes, weeklyRes] = await Promise.all([
+        axios.get(`http://localhost:5000/api/stats/${date}`),
+        axios.get('http://localhost:5000/api/workouts'),
+        axios.get('http://localhost:5000/api/stats/range/weekly')
+      ]);
+
+      setStats({
+        calories: statsRes.data.caloriesBurned || 847,
+        minutes: statsRes.data.activeMinutes || 48,
+        steps: statsRes.data.steps || 7342,
+        water: statsRes.data.water || 1.8
+      });
+      setWorkouts(workoutsRes.data.slice(0, 3));
+      
+      // Map weekly data or use defaults
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const defaultHeights = [80, 60, 90, 45, 70, 55, 100];
+      setWeeklyBars(days.map((d, i) => ({ day: d, height: defaultHeights[i] })));
+
     } catch (err) {
-      console.error("Error fetching workouts", err);
+      console.error("Error fetching dashboard data", err);
     }
   };
 
@@ -32,7 +51,7 @@ const Dashboard = () => {
       await axios.post('http://localhost:5000/api/workouts', newWorkout);
       setIsModalOpen(false);
       setNewWorkout({ type: '', duration: '', calories: '', notes: '' });
-      fetchWorkouts();
+      fetchInitialData();
     } catch (err) {
       console.error("Error saving workout", err);
     }
@@ -43,7 +62,7 @@ const Dashboard = () => {
       <div className="topbar">
         <div className="greeting">
           <h1>GOOD MORNING, ALI</h1>
-          <p>Monday, 21 April 2026 &nbsp;|&nbsp; Week 4 of your 12-week plan</p>
+          <p>{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>
         <div className="topbar-right">
           <div className="streak-badge">
@@ -62,12 +81,40 @@ const Dashboard = () => {
         <StatCard label="Water Intake" value={stats.water} unit="L of 3L goal" color="var(--accent-orange)" icon={<Droplets size={20} />} trend="-3%" isDown={true} />
       </div>
 
-      <div className="section-label">Recent Workouts</div>
+      <div className="mid-grid">
+        <div className="progress-section">
+          <div className="section-header">
+            <div className="section-title">WEEKLY WORKOUT INTENSITY</div>
+            <div className="section-tag">This Week</div>
+          </div>
+          <div className="weekly-bars">
+            {weeklyBars.map((b, i) => (
+              <div key={i} className="day-col">
+                <div className="day-bar-wrap">
+                  <div className={`day-bar ${i === 0 ? 'today' : ''}`} style={{ height: `${b.height}%` }}></div>
+                </div>
+                <div className={`day-label ${i === 0 ? 'today' : ''}`}>{b.day}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="goals-panel">
+          <div className="section-header">
+            <div className="section-title">GOALS</div>
+            <div className="section-tag">Monthly</div>
+          </div>
+          <GoalItem name="Weight Loss" pct={72} color="var(--accent-green)" />
+          <GoalItem name="Muscle Gain" pct={58} color="var(--accent-cyan)" />
+          <GoalItem name="Endurance" pct={85} color="var(--accent-purple)" />
+        </div>
+      </div>
+
+      <div className="section-label">Recent Activities</div>
       <div className="workout-grid">
         {workouts.map((w, i) => (
           <WorkoutCard key={i} workout={w} />
         ))}
-        {workouts.length === 0 && <p style={{ color: 'var(--text-muted)' }}>No workouts logged yet.</p>}
       </div>
 
       <button className="add-btn" onClick={() => setIsModalOpen(true)}>
@@ -75,7 +122,7 @@ const Dashboard = () => {
       </button>
 
       {isModalOpen && (
-        <div className="modal-overlay">
+        <div className="modal-overlay open">
           <div className="modal">
             <h2 className="modal-title">Log Workout</h2>
             <div className="form-group">
@@ -109,7 +156,7 @@ const Dashboard = () => {
   );
 };
 
-const StatCard = ({ label, value, unit, color, trend, isDown }) => (
+const StatCard = ({ label, value, unit, color, icon, trend, isDown }) => (
   <div className="stat-card" style={{ '--accent-color-solid': color }}>
     <div className="stat-label">{label}</div>
     <div className="stat-value">{value.toLocaleString()}</div>
@@ -118,21 +165,25 @@ const StatCard = ({ label, value, unit, color, trend, isDown }) => (
   </div>
 );
 
+const GoalItem = ({ name, pct, color }) => (
+  <div className="goal-item" style={{ marginBottom: '22px' }}>
+    <div className="goal-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+      <span className="goal-name" style={{ fontSize: '13px', fontWeight: '600' }}>{name}</span>
+      <span className="goal-pct" style={{ color, fontFamily: 'Bebas Neue', fontSize: '18px' }}>{pct}%</span>
+    </div>
+    <div className="goal-bar" style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px' }}>
+      <div className="goal-fill" style={{ width: `${pct}%`, background: color, height: '100%', borderRadius: '10px' }}></div>
+    </div>
+  </div>
+);
+
 const WorkoutCard = ({ workout }) => (
   <div className="workout-card">
-    <div className="wc-title" style={{ fontFamily: 'Bebas Neue', fontSize: '20px', letterSpacing: '1.5px', marginBottom: '4px' }}>{workout.type}</div>
-    <div className="wc-meta" style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-      {new Date(workout.date).toLocaleDateString()} &nbsp;|&nbsp; {new Date(workout.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-    </div>
-    <div className="wc-stats" style={{ display: 'flex', gap: '16px' }}>
-      <div className="wc-stat">
-        <div className="n" style={{ fontFamily: 'Bebas Neue', fontSize: '24px', color: 'var(--accent-green)' }}>{workout.duration}</div>
-        <div className="u" style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Mins</div>
-      </div>
-      <div className="wc-stat">
-        <div className="n" style={{ fontFamily: 'Bebas Neue', fontSize: '24px', color: 'var(--accent-green)' }}>{workout.calories}</div>
-        <div className="u" style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Kcal</div>
-      </div>
+    <div className="wc-title">{workout.type}</div>
+    <div className="wc-meta">{new Date(workout.date).toLocaleDateString()}</div>
+    <div className="wc-stats">
+      <div className="wc-stat"><div className="n">{workout.duration}</div><div className="u">Mins</div></div>
+      <div className="wc-stat"><div className="n">{workout.calories}</div><div className="u">Kcal</div></div>
     </div>
   </div>
 );
