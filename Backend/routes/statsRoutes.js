@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const DailyStats = require('../models/DailyStats');
+const DailyStats = require('../../Core/models/DailyStats');
 
 // Get stats for a specific day
 router.get('/:date', async (req, res) => {
