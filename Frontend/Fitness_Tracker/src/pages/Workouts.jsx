@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Filter, Play } from 'lucide-react';
+import { Search, Filter, Play, Clock, Flame, Dumbbell, History } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Workouts = () => {
+  const { user } = useAuth();
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const authConfig = {
+    headers: { Authorization: `Bearer ${user.token}` }
+  };
 
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/workouts');
+        const res = await axios.get('http://localhost:5000/api/workouts', authConfig);
         setWorkouts(res.data);
         setLoading(false);
       } catch (err) {
@@ -24,83 +30,107 @@ const Workouts = () => {
     <main className="main">
       <div className="topbar">
         <div className="greeting">
-          <h1>Training Log</h1>
-          <p>Every rep counts. Track your history and personal records.</p>
+          <h1 style={{fontFamily: 'Bebas Neue', fontSize: '48px', letterSpacing: '3px'}}>TRAINING LOG</h1>
+          <p>Every rep counts. Your complete fitness journey in one place.</p>
         </div>
       </div>
 
-      <div className="section-header" style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', gap: '12px', flex: 1 }}>
+      <div className="search-bar-wrap" style={{ marginBottom: '40px', display: 'flex', gap: '15px' }}>
           <div style={{ position: 'relative', flex: 1 }}>
-            <Search size={18} style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <Search size={18} style={{ position: 'absolute', left: '18px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
               type="text" 
               className="form-input" 
-              placeholder="Search workouts..." 
-              style={{ paddingLeft: '45px', background: 'var(--bg-card)' }}
+              placeholder="Search by workout type or notes..." 
+              style={{ paddingLeft: '50px', height: '56px', borderRadius: '18px', border: '1px solid var(--border)' }}
             />
           </div>
-          <button className="btn-cancel" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button className="premium-filter-btn">
             <Filter size={18} /> Filters
           </button>
-        </div>
       </div>
 
-      <div className="section-label">All Activities</div>
-      <div className="workout-grid">
+      <div className="section-label"><History size={16} style={{marginRight: '8px'}} /> ALL ACTIVITIES</div>
+      <div className="workout-list-container">
         {loading ? (
-          <p>Loading your sweat session history...</p>
-        ) : (
-          workouts.map((w, i) => (
-            <div key={i} className="workout-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <div className="wc-title">{w.type}</div>
-                <div className="section-tag" style={{ border: '1px solid var(--accent-green)', color: 'var(--accent-green)' }}>Completed</div>
-              </div>
-              
-              <div className="wc-meta">
-                {new Date(w.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </div>
-
-              <div className="wc-stats">
-                <div className="wc-stat">
-                  <div className="n">{w.duration}</div>
-                  <div className="u">Mins</div>
-                </div>
-                <div className="wc-stat">
-                  <div className="n">{w.calories}</div>
-                  <div className="u">Kcal</div>
-                </div>
-              </div>
-
-              {w.notes && (
-                <div style={{ marginTop: '16px', fontSize: '13px', color: 'var(--text-muted)', borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
-                  "{w.notes}"
-                </div>
-              )}
+             <div className="workout-card" style={{textAlign: 'center', padding: '40px'}}>
+                <Dumbbell className="animate-spin" style={{margin: '0 auto 15px', color: 'var(--accent-green)'}} />
+                <p>Loading your training data...</p>
+             </div>
+        ) : workouts.length > 0 ? workouts.map((w, i) => (
+             <DetailedWorkoutCard key={i} workout={w} />
+        )) : (
+            <div className="workout-card" style={{textAlign: 'center', padding: '60px', borderStyle: 'dashed'}}>
+                <Dumbbell size={48} style={{color: 'var(--text-muted)', marginBottom: '20px', opacity: 0.3}} />
+                <p style={{color: 'var(--text-muted)', fontWeight: '600'}}>No workouts logged yet. Your hard work will appear here.</p>
             </div>
-          ))
         )}
       </div>
 
-      <div className="section-label" style={{ marginTop: '40px' }}>Recommended for Today</div>
-      <div className="workout-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+      <div className="section-label" style={{ marginTop: '50px' }}>RECOMMENDED FOR TODAY</div>
+      <div className="workout-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))' }}>
         <SuggestionCard title="High Intensity Interval" time="25 mins" cals="350" color="var(--accent-purple)" />
         <SuggestionCard title="Mobility & Stretching" time="15 mins" cals="80" color="var(--accent-orange)" />
       </div>
+
+      <style>{`
+        .premium-filter-btn {
+            background: var(--bg-card); border: 1px solid var(--border);
+            color: white; padding: 0 25px; border-radius: 18px;
+            display: flex; align-items: center; gap: 10px; cursor: pointer;
+            transition: 0.3s; font-weight: 600;
+        }
+        .premium-filter-btn:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+        
+        .detailed-workout-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 25px; margin-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 1fr auto; align-items: center;
+            transition: 0.3s;
+        }
+        .detailed-workout-card:hover { border-color: rgba(0, 255, 137, 0.2); background: rgba(255,255,255,0.02); }
+        
+        .dw-title { font-family: 'Bebas Neue'; font-size: 26px; letter-spacing: 1px; color: white; display: flex; align-items: center; gap: 12px; }
+        .dw-date { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+        .dw-metrics { display: flex; gap: 30px; }
+        .dw-metric { display: flex; align-items: center; gap: 8px; }
+        .dw-metric span { font-weight: 700; font-size: 18px; }
+        .dw-status { background: rgba(0, 255, 137, 0.1); color: var(--accent-green); padding: 6px 15px; border-radius: 20px; font-size: 11px; font-weight: 800; border: 1px solid rgba(0, 255, 137, 0.2); }
+      `}</style>
     </main>
   );
 };
 
+const DetailedWorkoutCard = ({ workout }) => (
+    <div className="detailed-workout-card">
+        <div>
+            <div className="dw-title">{workout.type.toUpperCase()}</div>
+            <div className="dw-date">{new Date(workout.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+        </div>
+        <div className="dw-metrics">
+            <div className="dw-metric">
+                <Clock size={18} color="var(--accent-green)" />
+                <span>{workout.duration} <small style={{fontSize: '10px', color: 'var(--text-muted)'}}>MINS</small></span>
+            </div>
+            <div className="dw-metric">
+                <Flame size={18} color="var(--accent-orange)" />
+                <span>{workout.calories} <small style={{fontSize: '10px', color: 'var(--text-muted)'}}>KCAL</small></span>
+            </div>
+        </div>
+        <div className="dw-status">COMPLETED</div>
+    </div>
+);
+
 const SuggestionCard = ({ title, time, cals, color }) => (
-  <div className="workout-card" style={{ background: `linear-gradient(45deg, var(--bg-card), rgba(255,255,255,0.02))` }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <div className="workout-card" style={{ position: 'relative', overflow: 'hidden' }}>
+    <div style={{ position: 'absolute', top: '-10px', right: '-10px', width: '100px', height: '100px', background: `${color}10`, borderRadius: '50%' }}></div>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', z-index: 1 }}>
       <div>
-        <div className="wc-title">{title}</div>
-        <div className="wc-meta" style={{ marginBottom: '0' }}>{time} • {cals} Kcal</div>
+        <div className="wc-title" style={{fontFamily: 'Bebas Neue', fontSize: '24px'}}>{title.toUpperCase()}</div>
+        <div className="wc-meta" style={{ marginBottom: '0', fontWeight: '600' }}>{time} • {cals} Kcal</div>
       </div>
-      <button className="add-btn" style={{ position: 'static', width: '40px', height: '40px', background: color }}>
-        <Play size={18} fill="#000" />
+      <button className="add-btn" style={{ position: 'static', width: '45px', height: '45px', background: color, color: '#000' }}>
+        <Play size={20} fill="#000" />
       </button>
     </div>
   </div>
