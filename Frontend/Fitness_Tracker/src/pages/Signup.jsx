@@ -28,6 +28,24 @@ const Signup = () => {
         }
     };
 
+    const handleGoogleSignup = async () => {
+        setLoading(true);
+        try {
+            const socialData = {
+                email: `google_user_${Math.floor(Math.random()*1000)}@example.com`,
+                name: `Google User`,
+                provider: 'google'
+            };
+            const { data } = await axios.post('http://localhost:5000/api/auth/social-login', socialData);
+            login(data);
+            navigate('/');
+        } catch (err) {
+            setError("Google signup failed.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="auth-container premium-dark">
             <div className="auth-card glassmorphism animate-fade-in">
@@ -89,7 +107,14 @@ const Signup = () => {
                         {loading ? 'PROCESSING...' : 'CREATE ACCOUNT'}
                     </button>
                     
-                    <div className="divider"><span>OR JOIN WITH EMAIL ABOVE</span></div>
+                    <div className="divider"><span>OR QUICK JOIN WITH GOOGLE</span></div>
+
+                    <button type="button" className="google-custom-btn" onClick={handleGoogleSignup}>
+                         <div className="google-icon-wrapper">
+                            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84a4.14 4.14 0 0 1-1.8 2.71v2.24h2.91c1.71-1.58 2.69-3.91 2.69-6.6z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.24c-.8.54-1.84.87-3.05.87-2.34 0-4.33-1.58-5.04-3.71H.96v2.3A8.99 8.99 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.96 10.74A5.4 5.4 0 0 1 3.6 9c0-.6.1-1.18.27-1.74l-2.31-2.3A8.99 8.99 0 0 0 0 9c0 1.9.59 3.65 1.59 5.09l2.37-1.35z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59A8.96 8.96 0 0 0 9 0 8.99 8.99 0 0 0 .96 5.7l2.31 2.3c.71-2.13 2.7-3.71 5.04-3.71z"/></svg>
+                         </div>
+                         <span>Sign up with Google</span>
+                    </button>
                 </form>
 
                 <div className="auth-footer">
@@ -118,9 +143,13 @@ const Signup = () => {
                 .login-btn { width: 100%; padding: 16px; background: var(--accent-green); color: black; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
                 .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 255, 137, 0.2); }
                 
-                .divider { text-align: center; margin: 35px 0; border-top: 1px solid rgba(255,255,255,0.05); position: relative; }
+                .divider { text-align: center; margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.05); position: relative; }
                 .divider span { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0d1117; padding: 0 15px; font-size: 10px; color: #475569; font-weight: 800; letter-spacing: 1px; }
                 
+                .google-custom-btn { width: 100%; background: white; color: #3c4043; border: 1px solid #dadce0; border-radius: 12px; padding: 12px; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+                .google-custom-btn:hover { background: #f8f9fa; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+                .google-icon-wrapper { margin-right: 12px; display: flex; align-items: center; }
+
                 .auth-footer { text-align: center; margin-top: 35px; color: #64748b; font-size: 13px; font-weight: 600; }
                 .glow-link { color: var(--accent-green); text-decoration: none; margin-left: 5px; border-bottom: 1px dashed transparent; transition: 0.3s; }
                 .glow-link:hover { border-color: var(--accent-green); text-shadow: 0 0 10px rgba(0,255,137,0.5); }
