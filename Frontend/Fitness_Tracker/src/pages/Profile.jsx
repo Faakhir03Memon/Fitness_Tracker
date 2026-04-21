@@ -9,6 +9,8 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
+    weight: user?.weight || '',
+    height: user?.height || '',
     password: ''
   });
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -97,6 +99,26 @@ const Profile = () => {
                   />
                 </div>
               </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                <div className="form-group">
+                  <label style={{ display: 'block', color: 'var(--text-muted)', marginBottom: '5px', fontSize: '0.8rem' }}>Weight (kg)</label>
+                  <input 
+                    type="number" 
+                    value={formData.weight} 
+                    onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                    style={{ width: '100%', background: '#1e293b', border: '1px solid #334155', color: 'white', padding: '10px', borderRadius: '6px' }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label style={{ display: 'block', color: 'var(--text-muted)', marginBottom: '5px', fontSize: '0.8rem' }}>Height (cm)</label>
+                  <input 
+                    type="number" 
+                    value={formData.height} 
+                    onChange={(e) => setFormData({...formData, height: e.target.value})}
+                    style={{ width: '100%', background: '#1e293b', border: '1px solid #334155', color: 'white', padding: '10px', borderRadius: '6px' }}
+                  />
+                </div>
+              </div>
               <div className="form-group" style={{ marginBottom: '15px' }}>
                 <label style={{ display: 'block', color: 'var(--text-muted)', marginBottom: '5px', fontSize: '0.8rem' }}>New Password (Leave blank to keep current)</label>
                 <input 
@@ -114,6 +136,16 @@ const Profile = () => {
             <div>
               <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '36px', letterSpacing: '2px' }}>{user?.name?.toUpperCase()}</h2>
               <p style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>{user?.email} &nbsp;|&nbsp; {user?.role === 'admin' ? 'Administrator' : 'Fitness Enthusiast'}</p>
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ background: '#312e81', padding: '5px 12px', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block' }}>Weight</span>
+                    <span style={{ fontWeight: 'bold' }}>{user?.weight || '--'} kg</span>
+                </div>
+                <div style={{ background: '#312e81', padding: '5px 12px', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block' }}>Height</span>
+                    <span style={{ fontWeight: 'bold' }}>{user?.height || '--'} cm</span>
+                </div>
+              </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <span className="section-tag" style={{ border: '1px solid var(--accent-green)', color: 'var(--accent-green)' }}>Verified</span>
                 <span className="section-tag">Active Member</span>
