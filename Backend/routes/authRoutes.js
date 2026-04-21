@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Admin = require('../models/Admin');
+const { protect } = require('../middleware/authMiddleware');
 
 // Generate JWT Token
 const generateToken = (id, role = 'user') => {
@@ -69,6 +70,40 @@ router.post('/login', async (req, res) => {
         res.status(401).json({ message: 'User not found or Invalid credentials' });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+// @route   GET /api/auth/profile
+// @desc    Get user profile
+router.get('/profile', protect, async (req, res) => {
+    if (req.user) {
+        res.json(req.user);
+    } else {
+        res.status(404).json({ message: 'User not found' });
+    }
+});
+
+// @route   PUT /api/auth/profile
+// @desc    Update user profile
+router.put('/profile', protect, async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        user.name = req.body.name || user.name;
+        user.email = req.body.email || user.email;
+        if (req.body.password) {
+            user.password = req.body.password;
+        }
+
+        const updatedUser = await user.save();
+        res.json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            token: generateToken(updatedUser._id),
+        });
+    } else {
+        res.status(404).json({ message: 'User not found' });
     }
 });
 

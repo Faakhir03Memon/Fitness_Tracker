@@ -4,6 +4,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const workoutRoutes = require('./routes/workoutRoutes');
 const statsRoutes = require('./routes/statsRoutes');
+const authRoutes = require('./routes/authRoutes');
+const Admin = require('./models/Admin');
 
 dotenv.config();
 
@@ -17,6 +19,7 @@ app.use(express.json());
 // Routes
 app.use('/api/workouts', workoutRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check
 app.get('/', (req, res) => {
@@ -25,8 +28,20 @@ app.get('/', (req, res) => {
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log('Connected to MongoDB');
+    
+    // Seed Admin User
+    const adminEmail = 'fit@admin.com';
+    const adminExists = await Admin.findOne({ email: adminEmail });
+    if (!adminExists) {
+        await Admin.create({
+            email: adminEmail,
+            password: 'F1it@access.com'
+        });
+        console.log('Admin user seeded successfully');
+    }
+
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
