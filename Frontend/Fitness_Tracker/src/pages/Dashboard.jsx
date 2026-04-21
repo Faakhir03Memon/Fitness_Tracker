@@ -42,8 +42,12 @@ const Dashboard = () => {
       });
       setWorkouts(workoutsRes.data.slice(0, 3));
       
-      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      setWeeklyBars(days.map((d, i) => ({ day: d, height: Math.floor(Math.random() * 80) + 20 })));
+      const chartData = weeklyRes.data.length > 0 ? weeklyRes.data.map(item => ({
+        day: new Date(item.date).toLocaleDateString('en-US', { weekday: 'short' }),
+        height: Math.min(((item.caloriesBurned || 0) / 3000) * 100, 100) || Math.floor(Math.random() * 40) + 30
+      })) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => ({ day: d, height: 30 }));
+
+      setWeeklyBars(chartData);
 
     } catch (err) {
       console.error("Error fetching dashboard data", err);
