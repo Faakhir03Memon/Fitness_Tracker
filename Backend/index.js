@@ -31,6 +31,13 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(async () => {
     console.log('Connected to MongoDB');
     
+    // Fix legacy indexing issue that causes 500 errors
+    try {
+        const db = mongoose.connection.db;
+        await db.collection('dailystats').dropIndex('date_1').catch(() => {});
+        console.log('Database indexes synchronized');
+    } catch (err) {}
+
     // Seed Admin User
     const adminEmail = 'fit@admin.com';
     const adminExists = await Admin.findOne({ email: adminEmail });
