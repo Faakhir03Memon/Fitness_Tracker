@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Mail, Lock, User as UserIcon } from 'lucide-react';
+import { LogIn, Mail, Lock, ShieldCheck, Github, Chrome } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -32,22 +32,28 @@ const Login = () => {
         }
     };
 
+    const handleGoogleLogin = () => {
+        // In a real app, logic for Google OAuth would go here
+        alert("Google Login Integration coming soon! (Requires Client ID configuration)");
+    };
+
     return (
-        <div className="auth-container">
-            <div className="auth-card animate-slide-up">
+        <div className="auth-container premium-dark">
+            <div className="auth-card glassmorphism animate-fade-in">
                 <div className="auth-header">
-                    <div className="auth-icon-circle">
-                        <LogIn size={32} color="#4f46e5" />
+                    <div className="auth-logo">
+                         <div className="logo-ring"></div>
+                         <ShieldCheck size={32} color="var(--accent-green)" />
                     </div>
-                    <h2>Welcome Back</h2>
-                    <p>Enter your details to track your progress</p>
+                    <h2 className="bebas-font">WELCOME BACK</h2>
+                    <p className="auth-subtitle">Login to access your high-performance dashboard</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label>Email Address</label>
-                        <div className="input-with-icon">
-                            <Mail size={18} className="input-icon" />
+                    <div className="input-group">
+                        <label>EMAIL ADDRESS</label>
+                        <div className="input-field">
+                            <Mail size={18} />
                             <input
                                 type="email"
                                 placeholder="Enter your email"
@@ -58,10 +64,10 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label>Password</label>
-                        <div className="input-with-icon">
-                            <Lock size={18} className="input-icon" />
+                    <div className="input-group">
+                        <label>PASSWORD</label>
+                        <div className="input-field">
+                            <Lock size={18} />
                             <input
                                 type="password"
                                 placeholder="Enter your password"
@@ -72,94 +78,62 @@ const Login = () => {
                         </div>
                     </div>
 
-                    {error && <div className="error-message">{error}</div>}
+                    {error && <div className="auth-error">{error}</div>}
 
-                    <button type="submit" className="auth-btn" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
+                    <button type="submit" className="login-btn" disabled={loading}>
+                        {loading ? 'AUTHENTICATING...' : 'LOGIN TO ACCOUNT'}
                     </button>
+                    
+                    <div className="divider"><span>OR CONTINUE WITH</span></div>
+                    
+                    <div className="social-grid">
+                        <button type="button" className="social-btn" onClick={handleGoogleLogin}>
+                            <Chrome size={20} style={{marginRight: '10px'}} /> Google
+                        </button>
+                        <button type="button" className="social-btn">
+                            <Github size={20} style={{marginRight: '10px'}} /> Github
+                        </button>
+                    </div>
                 </form>
 
                 <div className="auth-footer">
-                    <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
+                    New to FitTrack? <Link to="/signup" className="glow-link">Create Account</Link>
                 </div>
             </div>
 
             <style>{`
-                .auth-container {
-                    min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: #0f172a;
-                    padding: 20px;
-                }
-                .auth-card {
-                    background: #1e293b;
-                    border: 1px solid #334155;
-                    border-radius: 16px;
-                    padding: 40px;
-                    width: 100%;
-                    max-width: 400px;
-                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-                }
-                .auth-header {
-                    text-align: center;
-                    margin-bottom: 30px;
-                }
-                .auth-icon-circle {
-                    background: #312e81;
-                    width: 64px;
-                    height: 64px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin: 0 auto 15px;
-                }
-                .auth-header h2 { color: white; margin-bottom: 5px; }
-                .auth-header p { color: #94a3b8; font-size: 0.9rem; }
+                .premium-dark { background: #030712; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+                .auth-card { background: rgba(13, 17, 23, 0.8); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; padding: 50px; width: 100%; max-width: 450px; }
+                .auth-header { text-align: center; margin-bottom: 40px; }
+                .auth-logo { width: 70px; height: 70px; border-radius: 50%; background: rgba(0, 255, 137, 0.05); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid rgba(0, 255, 137, 0.2); position: relative; }
+                .logo-ring { position: absolute; inset: -5px; border: 1px dashed rgba(0, 255, 137, 0.2); border-radius: 50%; animation: spin 10s linear infinite; }
+                @keyframes spin { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
                 
-                .form-group { margin-bottom: 20px; }
-                .form-group label { display: block; color: #cbd5e1; margin-bottom: 8px; font-size: 0.85rem; }
+                .bebas-font { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; color: white; }
+                .auth-subtitle { color: #94a3b8; font-size: 13px; font-weight: 600; }
                 
-                .input-with-icon { position: relative; }
-                .input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; }
+                .input-group { margin-bottom: 22px; }
+                .input-group label { display: block; font-size: 11px; font-weight: 800; color: #64748b; letter-spacing: 1px; margin-bottom: 10px; }
+                .input-field { display: flex; align-items: center; background: #080c10; border: 1px solid #1f2937; border-radius: 12px; padding: 0 20px; outline: 1px solid transparent; transition: 0.3s; }
+                .input-field svg { color: #475569; margin-right: 15px; }
+                .input-field input { background: none; border: none; padding: 14px 0; color: white; flex: 1; outline: none; }
+                .input-field:focus-within { border-color: var(--accent-green); outline-color: rgba(0,255,137,0.1); }
                 
-                input {
-                    width: 100%;
-                    padding: 12px 12px 12px 40px;
-                    background: #0f172a;
-                    border: 1px solid #334155;
-                    border-radius: 8px;
-                    color: white;
-                    transition: border 0.2s;
-                }
-                input:focus { border-color: #6366f1; outline: none; }
+                .login-btn { width: 100%; padding: 16px; background: var(--accent-green); color: black; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+                .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 255, 137, 0.2); }
                 
-                .auth-btn {
-                    width: 100%;
-                    padding: 12px;
-                    background: linear-gradient(135deg, #6366f1, #4f46e5);
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: transform 0.2s, background 0.2s;
-                }
-                .auth-btn:hover { transform: translateY(-2px); background: #4338ca; }
-                .auth-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+                .divider { text-align: center; margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.05); position: relative; }
+                .divider span { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0d1117; padding: 0 15px; font-size: 10px; color: #475569; font-weight: 800; letter-spacing: 1px; }
                 
-                .error-message { color: #ef4444; background: #450a0a; padding: 10px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 20px; border: 1px solid #7f1d1d; }
+                .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+                .social-btn { display: flex; align-items: center; justify-content: center; background: #080c10; border: 1px solid #1f2937; color: white; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.3s; }
+                .social-btn:hover { background: #111827; border-color: white; }
                 
-                .auth-footer { text-align: center; margin-top: 25px; color: #94a3b8; font-size: 0.9rem; }
-                .auth-footer a { color: #6366f1; text-decoration: none; font-weight: 600; }
+                .auth-footer { text-align: center; margin-top: 35px; color: #64748b; font-size: 13px; font-weight: 600; }
+                .glow-link { color: var(--accent-green); text-decoration: none; margin-left: 5px; border-bottom: 1px dashed transparent; transition: 0.3s; }
+                .glow-link:hover { border-color: var(--accent-green); text-shadow: 0 0 10px rgba(0,255,137,0.5); }
                 
-                @keyframes slideUp {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
+                .auth-error { color: #ef4444; font-size: 12px; font-weight: 600; margin-bottom: 15px; background: rgba(239, 68, 68, 0.05); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.1); }
             `}</style>
         </div>
     );
