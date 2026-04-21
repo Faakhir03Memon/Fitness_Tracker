@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const workoutRoutes = require('./routes/workoutRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const authRoutes = require('./routes/authRoutes');
+const mealRoutes = require('./routes/mealRoutes');
 const Admin = require('./models/Admin');
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use('/api/workouts', workoutRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/meals', mealRoutes);
 
 // Health check
 app.get('/', (req, res) => {
