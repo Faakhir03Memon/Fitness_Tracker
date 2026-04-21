@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Mail, Lock, ShieldCheck, User, Search, Facebook, Code } from 'lucide-react';
+import { LogIn, Mail, Lock, ShieldCheck, User, Search, Globe, Terminal } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -91,10 +91,10 @@ const Login = () => {
                             <Search size={18} /> Google
                         </button>
                         <button type="button" className="social-btn">
-                            <Facebook size={18} /> Facebook
+                            <Globe size={18} /> Facebook
                         </button>
                         <button type="button" className="social-btn">
-                            <Code size={18} /> Github
+                            <Terminal size={18} /> Github
                         </button>
                     </div>
                 </form>
