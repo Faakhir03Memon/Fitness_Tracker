@@ -11,6 +11,7 @@ const Signup = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [emailSent, setEmailSent] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -18,8 +19,9 @@ const Signup = () => {
         setError('');
         setLoading(true);
         try {
-            await axios.post('http://localhost:5000/api/auth/signup', { name, email, password });
-            setSubmitted(true); // Show success screen: check email
+            const { data } = await axios.post('http://localhost:5000/api/auth/signup', { name, email, password });
+            setEmailSent(data.emailSent);
+            setSubmitted(true);
         } catch (err) {
             setError(err.response?.data?.message || 'Error occurred during signup');
         } finally {

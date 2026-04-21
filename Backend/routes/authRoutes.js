@@ -15,7 +15,7 @@ const generateToken = (id, role = 'user') => {
 };
 
 // @route   POST /api/auth/signup
-// @desc    Register a new user & send verification email
+// @desc    Register a new user & attempt to send verification email
 router.post('/signup', async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -28,20 +28,42 @@ router.post('/signup', async (req, res) => {
         // Generate a secure verification token
         const verificationToken = crypto.randomBytes(32).toString('hex');
 
+        // Check if email is configured in .env
+        const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
+
         const user = await User.create({
             name,
             email,
             password,
-            isVerified: false,
-            verificationToken
+            // Auto-verify if email not configured (dev/testing mode)
+            isVerified: !emailConfigured,
+            verificationToken: emailConfigured ? verificationToken : undefined
         });
 
-        // Send verification email
-        await sendVerificationEmail(email, name, verificationToken);
+        if (emailConfigured) {
+            // Try to send verification email
+            try {
+                await sendVerificationEmail(email, name, verificationToken);
+                return res.status(201).json({
+                    message: 'Account created! Please check your email to verify your account before logging in.',
+                    emailSent: true
+                });
+            } catch (emailErr) {
+                // Email failed - auto-verify user so they can still login
+                user.isVerified = true;
+                user.verificationToken = undefined;
+                await user.save();
+                return res.status(201).json({
+                    message: 'Account created successfully! Email service unavailable, but you can login now.',
+                    emailSent: false
+                });
+            }
+        }
 
+        // No email config - direct login ready
         res.status(201).json({
-            message: 'Account created! Please check your email to verify your account before logging in.',
-            emailSent: true
+            message: 'Account created successfully! You can now login.',
+            emailSent: false
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
