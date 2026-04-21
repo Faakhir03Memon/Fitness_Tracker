@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Mail, Lock, ShieldCheck, User, Search } from 'lucide-react';
+import { LogIn, Mail, Lock, ShieldCheck, User, Search, Facebook, Code } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -86,12 +86,15 @@ const Login = () => {
                     
                     <div className="divider"><span>OR CONTINUE WITH</span></div>
                     
-                    <div className="social-grid">
+                    <div className="social-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px'}}>
                         <button type="button" className="social-btn" onClick={handleGoogleLogin}>
-                            <Search size={20} style={{marginRight: '10px'}} /> Google
+                            <Search size={18} /> Google
                         </button>
                         <button type="button" className="social-btn">
-                            <User size={20} style={{marginRight: '10px'}} /> Discord
+                            <Facebook size={18} /> Facebook
+                        </button>
+                        <button type="button" className="social-btn">
+                            <Code size={18} /> Github
                         </button>
                     </div>
                 </form>
