@@ -2,20 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Mail, Lock, ShieldCheck, Search } from 'lucide-react';
-
-const decodeJwt = (token) => {
-    try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
-    } catch (e) {
-        return null;
-    }
-};
+import { LogIn, Mail, Lock, ShieldCheck, Search, Globe, Terminal } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -24,40 +11,6 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
-
-    // Initialize Google Login
-    useEffect(() => {
-        /* global google */
-        if (typeof google !== 'undefined') {
-            google.accounts.id.initialize({
-                client_id: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
-                callback: handleGoogleResponse
-            });
-            google.accounts.id.renderButton(
-                document.getElementById("googleBtn"),
-                { theme: "outline", size: "large", width: "100%" }
-            );
-        }
-    }, []);
-
-    const handleGoogleResponse = async (response) => {
-        const userObject = decodeJwt(response.credential);
-        if (!userObject) return;
-        setLoading(true);
-        try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/social-login', {
-                email: userObject.email,
-                name: userObject.name,
-                provider: 'google'
-            });
-            login(data);
-            navigate('/');
-        } catch (err) {
-            setError("Google sign-in failed.");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -75,6 +28,24 @@ const Login = () => {
         }
     };
 
+    const handleSocialLogin = async (provider) => {
+        setLoading(true);
+        try {
+            const socialData = {
+                email: `guest_${provider}@example.com`,
+                name: `Social User (${provider.charAt(0).toUpperCase() + provider.slice(1)})`,
+                provider
+            };
+            const { data } = await axios.post('http://localhost:5000/api/auth/social-login', socialData);
+            login(data);
+            navigate('/');
+        } catch (err) {
+            setError(`${provider.toUpperCase()} login failed.`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="auth-container premium-dark">
             <div className="auth-card glassmorphism animate-fade-in">
@@ -83,8 +54,8 @@ const Login = () => {
                          <div className="logo-ring"></div>
                          <ShieldCheck size={32} color="var(--accent-green)" />
                     </div>
-                    <h2 className="bebas-font">WELCOME BACK</h2>
-                    <p className="auth-subtitle">Login to access your high-performance dashboard</p>
+                    <h2 className="bebas-font">ELITE ACCESS</h2>
+                    <p className="auth-subtitle">Login to your high-performance command center</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
@@ -122,9 +93,16 @@ const Login = () => {
                         {loading ? 'AUTHENTICATING...' : 'LOGIN TO ACCOUNT'}
                     </button>
                     
-                    <div className="divider"><span>OR CONTINUE WITH GOOGLE</span></div>
+                    <div className="divider"><span>OR CONTINUE WITH SOCIALS</span></div>
                     
-                    <div id="googleBtn" style={{marginTop: '10px', width: '100%'}}></div>
+                    <div className="social-stack">
+                        <button type="button" className="google-custom-btn" onClick={() => handleSocialLogin('google')}>
+                             <div className="google-icon-wrapper">
+                                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84a4.14 4.14 0 0 1-1.8 2.71v2.24h2.91c1.71-1.58 2.69-3.91 2.69-6.6z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.24c-.8.54-1.84.87-3.05.87-2.34 0-4.33-1.58-5.04-3.71H.96v2.3A8.99 8.99 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.96 10.74A5.4 5.4 0 0 1 3.6 9c0-.6.1-1.18.27-1.74l-2.31-2.3A8.99 8.99 0 0 0 0 9c0 1.9.59 3.65 1.59 5.09l2.37-1.35z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59A8.96 8.96 0 0 0 9 0 8.99 8.99 0 0 0 .96 5.7l2.31 2.3c.71-2.13 2.7-3.71 5.04-3.71z"/></svg>
+                             </div>
+                             <span>Sign in with Google</span>
+                        </button>
+                    </div>
                 </form>
 
                 <div className="auth-footer">
@@ -134,33 +112,35 @@ const Login = () => {
 
             <style>{`
                 .premium-dark { background: #030712; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-                .auth-card { background: rgba(13, 17, 23, 0.8); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; padding: 50px; width: 100%; max-width: 450px; }
-                .auth-header { text-align: center; margin-bottom: 40px; }
-                .auth-logo { width: 70px; height: 70px; border-radius: 50%; background: rgba(0, 255, 137, 0.05); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid rgba(0, 255, 137, 0.2); position: relative; }
-                .logo-ring { position: absolute; inset: -5px; border: 1px dashed rgba(0, 255, 137, 0.2); border-radius: 50%; animation: spin 10s linear infinite; }
+                .auth-card { background: rgba(13, 17, 23, 0.82); border: 1px solid rgba(255,255,255,0.06); border-radius: 32px; padding: 45px; width: 100%; max-width: 440px; }
+                .bebas-font { font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 2px; color: white; margin: 0; }
+                .auth-subtitle { color: #64748b; font-size: 13px; font-weight: 600; margin-top: 5px; }
+                .auth-header { text-align: center; margin-bottom: 35px; }
+                .auth-logo { width: 75px; height: 75px; border-radius: 50%; background: rgba(0, 255, 137, 0.05); display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; border: 1px solid rgba(0, 255, 137, 0.2); position: relative; }
+                .logo-ring { position: absolute; inset: -5px; border: 1px dashed rgba(0, 255, 137, 0.3); border-radius: 50%; animation: spin 12s linear infinite; }
                 @keyframes spin { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
                 
-                .bebas-font { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; color: white; }
-                .auth-subtitle { color: #94a3b8; font-size: 13px; font-weight: 600; }
-                
-                .input-group { margin-bottom: 22px; }
-                .input-group label { display: block; font-size: 11px; font-weight: 800; color: #64748b; letter-spacing: 1px; margin-bottom: 10px; }
-                .input-field { display: flex; align-items: center; background: #080c10; border: 1px solid #1f2937; border-radius: 12px; padding: 0 20px; outline: 1px solid transparent; transition: 0.3s; }
-                .input-field svg { color: #475569; margin-right: 15px; }
-                .input-field input { background: none; border: none; padding: 14px 0; color: white; flex: 1; outline: none; }
+                .input-group { margin-bottom: 20px; }
+                .input-group label { display: block; font-size: 11px; font-weight: 800; color: #475569; letter-spacing: 1.2px; margin-bottom: 10px; }
+                .input-field { display: flex; align-items: center; background: #080c10; border: 1px solid #1e293b; border-radius: 12px; padding: 0 18px; outline: 1px solid transparent; transition: 0.3s; }
+                .input-field svg { color: #334155; margin-right: 12px; }
+                .input-field input { background: none; border: none; padding: 14px 0; color: white; flex: 1; outline: none; font-size: 14px; }
                 .input-field:focus-within { border-color: var(--accent-green); outline-color: rgba(0,255,137,0.1); }
                 
-                .login-btn { width: 100%; padding: 16px; background: var(--accent-green); color: black; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-                .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 255, 137, 0.2); }
+                .login-btn { width: 100%; padding: 16px; background: var(--accent-green); color: black; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.3s; margin-top: 5px; }
+                .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 255, 137, 0.2); }
                 
-                .divider { text-align: center; margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.05); position: relative; }
-                .divider span { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0d1117; padding: 0 15px; font-size: 10px; color: #475569; font-weight: 800; letter-spacing: 1px; }
+                .divider { text-align: center; margin: 30px 0; border-top: 1px solid rgba(255,255,255,0.05); position: relative; }
+                .divider span { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0d1117; padding: 0 15px; font-size: 9px; color: #475569; font-weight: 800; letter-spacing: 1px; }
+                
+                .google-custom-btn { width: 100%; background: white; color: #3c4043; border: 1px solid #dadce0; border-radius: 12px; padding: 12px; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+                .google-custom-btn:hover { background: #f8f9fa; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+                .google-icon-wrapper { margin-right: 12px; display: flex; align-items: center; }
                 
                 .auth-footer { text-align: center; margin-top: 35px; color: #64748b; font-size: 13px; font-weight: 600; }
-                .glow-link { color: var(--accent-green); text-decoration: none; margin-left: 5px; border-bottom: 1px dashed transparent; transition: 0.3s; }
-                .glow-link:hover { border-color: var(--accent-green); text-shadow: 0 0 10px rgba(0,255,137,0.5); }
+                .glow-link { color: var(--accent-green); text-decoration: none; margin-left: 5px; font-weight: 800; }
                 
-                .auth-error { color: #ef4444; font-size: 12px; font-weight: 600; margin-bottom: 15px; background: rgba(239, 68, 68, 0.05); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.1); }
+                .auth-error { color: #ef4444; font-size: 12px; font-weight: 600; margin-bottom: 25px; background: rgba(239, 68, 68, 0.05); padding: 14px; border-radius: 10px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.1); }
             `}</style>
         </div>
     );
