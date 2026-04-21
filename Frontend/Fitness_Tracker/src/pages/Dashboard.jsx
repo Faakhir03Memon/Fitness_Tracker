@@ -23,7 +23,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchInitialData();
-  }, []);
+  }, [user]);
 
   const fetchInitialData = async () => {
     if (!user || !user.token) return;
