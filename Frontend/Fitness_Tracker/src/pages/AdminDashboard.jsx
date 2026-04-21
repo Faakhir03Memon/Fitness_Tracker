@@ -82,6 +82,7 @@ const AdminDashboard = () => {
                             <th>User Name</th>
                             <th>Email Address</th>
                             <th>Status</th>
+                            <th>Provider</th>
                             <th>Role</th>
                             <th>Actions</th>
                         </tr>
@@ -103,6 +104,15 @@ const AdminDashboard = () => {
                                         {u.isBanned ? <XCircle size={12}/> : <CheckCircle size={12}/>}
                                         {u.status.toUpperCase()}
                                     </span>
+                                </td>
+                                <td>
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--accent-cyan)', fontWeight: 'bold'}}>
+                                        {u.provider === 'google' && <Search size={12}/>}
+                                        {u.provider === 'facebook' && <Globe size={12}/>}
+                                        {u.provider === 'github' && <Terminal size={12}/>}
+                                        {u.provider === 'email' && <Mail size={12}/>}
+                                        {u.provider.toUpperCase()}
+                                    </div>
                                 </td>
                                 <td><span style={{opacity: 0.6, fontSize: '12px', fontWeight: 'bold'}}>{u.role.toUpperCase()}</span></td>
                                 <td>

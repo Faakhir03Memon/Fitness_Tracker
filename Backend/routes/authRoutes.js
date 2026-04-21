@@ -129,7 +129,8 @@ router.post('/social-login', async (req, res) => {
                 email,
                 name,
                 password: Math.random().toString(36).slice(-8), // Dummy password
-                status: 'active'
+                status: 'active',
+                provider: provider || 'social'
             });
         }
 

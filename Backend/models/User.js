@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     isBanned: { type: Boolean, default: false },
     status: { type: String, default: 'active' },
     role: { type: String, default: 'user' },
+    provider: { type: String, default: 'email' },
     weight: { type: Number },
     height: { type: Number },
     age: { type: Number },
