@@ -7,263 +7,193 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:#050a14;font-family:'Inter',sans-serif;overflow:hidden;color:#fff;}
+  body{background:#000000;font-family:'Inter',sans-serif;overflow:hidden;color:#fff;}
   canvas{display:block;position:fixed;top:0;left:0;}
   #ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
   #title{position:fixed;top:20px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;}
-  #title h1{font-size:22px;font-weight:700;background:linear-gradient(135deg,#00f5a0,#00d9f5,#7b5ea7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;}
-  #title p{font-size:11px;color:#4a6fa5;margin-top:4px;letter-spacing:3px;text-transform:uppercase;}
+  #title h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#4169E1,#27408B);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;letter-spacing:2px;text-transform:uppercase;}
+  #title p{font-size:12px;color:#ffffff;margin-top:4px;letter-spacing:4px;text-transform:uppercase;opacity:0.8;}
   #legend{position:fixed;bottom:20px;left:20px;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
-  .leg{display:flex;align-items:center;gap:8px;font-size:11px;color:#8899aa;}
-  .leg-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
-  #tooltip{position:fixed;display:none;background:rgba(5,15,35,0.95);border:1px solid rgba(0,245,160,0.3);border-radius:10px;padding:12px 16px;font-size:12px;max-width:220px;pointer-events:none;z-index:20;box-shadow:0 0 20px rgba(0,245,160,0.15);}
-  #tooltip .tt-title{font-weight:700;font-size:14px;margin-bottom:6px;}
-  #tooltip .tt-type{font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;opacity:0.7;}
-  #tooltip .tt-desc{font-size:11px;line-height:1.6;color:#aabbcc;}
-  #stats{position:fixed;top:20px;right:20px;display:flex;flex-direction:column;gap:6px;pointer-events:none;}
-  .stat-pill{background:rgba(0,245,160,0.08);border:1px solid rgba(0,245,160,0.15);border-radius:20px;padding:4px 12px;font-size:10px;color:#00f5a0;text-align:center;}
-  #instructions{position:fixed;bottom:20px;right:20px;font-size:10px;color:#334455;text-align:right;line-height:1.8;pointer-events:none;}
+  .leg{display:flex;align-items:center;gap:8px;font-size:11px;color:#ffffff;opacity:0.7;}
+  .leg-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0;background:#4169E1;box-shadow:0 0 10px #4169E1;}
+  #tooltip{position:fixed;display:none;background:rgba(0,0,0,0.9);border:1px solid rgba(65,105,225,0.5);border-radius:4px;padding:12px 16px;font-size:12px;max-width:250px;pointer-events:none;z-index:20;box-shadow:0 0 30px rgba(65,105,225,0.2);backdrop-filter:blur(10px);}
+  #tooltip .tt-title{font-weight:700;font-size:15px;margin-bottom:6px;color:#4169E1;}
+  #tooltip .tt-type{font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;color:#ffffff;opacity:0.6;}
+  #tooltip .tt-desc{font-size:12px;line-height:1.6;color:#ffffff;}
+  #stats{position:fixed;top:20px;right:20px;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+  .stat-pill{background:rgba(65,105,225,0.1);border:1px solid rgba(65,105,225,0.3);border-radius:2px;padding:6px 15px;font-size:11px;color:#4169E1;text-align:center;font-weight:600;letter-spacing:1px;}
+  #instructions{position:fixed;bottom:20px;right:20px;font-size:11px;color:#ffffff;text-align:right;line-height:1.8;pointer-events:none;opacity:0.5;}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="title"><h1>⚡ FitTrack Project Memory</h1><p>Interactive Architecture Graph</p></div>
+<div id="title"><h1>FitTrack Architecture</h1><p>System Memory & Flow</p></div>
 <div id="stats">
-  <div class="stat-pill">12 Pages</div>
-  <div class="stat-pill">5 Models</div>
-  <div class="stat-pill">5 Routes</div>
-  <div class="stat-pill">MERN Stack</div>
+  <div class="stat-pill">FRONTEND: REACT</div>
+  <div class="stat-pill">BACKEND: NODE.JS</div>
+  <div class="stat-pill">DB: MONGODB</div>
+  <div class="stat-pill">AUTH: JWT/GOOGLE</div>
 </div>
 <div id="legend">
-  <div class="leg"><div class="leg-dot" style="background:#00f5a0;box-shadow:0 0 8px #00f5a0;"></div>Frontend Pages</div>
-  <div class="leg"><div class="leg-dot" style="background:#00d9f5;box-shadow:0 0 8px #00d9f5;"></div>Components / Context</div>
-  <div class="leg"><div class="leg-dot" style="background:#f5a000;box-shadow:0 0 8px #f5a000;"></div>Backend Routes</div>
-  <div class="leg"><div class="leg-dot" style="background:#f500b4;box-shadow:0 0 8px #f500b4;"></div>DB Models</div>
-  <div class="leg"><div class="leg-dot" style="background:#7b5ea7;box-shadow:0 0 8px #7b5ea7;"></div>Core / Hub</div>
+  <div class="leg"><div class="leg-dot"></div>Project Files (Royal Blue)</div>
+  <div class="leg" style="gap:4px;"><div style="width:20px;height:1px;background:#ffffff;"></div>Connections (White)</div>
 </div>
 <div id="tooltip">
   <div class="tt-type" id="tt-type"></div>
   <div class="tt-title" id="tt-title"></div>
   <div class="tt-desc" id="tt-desc"></div>
 </div>
-<div id="instructions">🖱 Drag nodes • Hover for info<br>Scroll to zoom • Click to highlight</div>
+<div id="instructions">DRAG nodes to organize<br>HOVER for file details<br>SCROLL to zoom in/out</div>
 
 <script>
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 let W = canvas.width = window.innerWidth;
 let H = canvas.height = window.innerHeight;
-let scale = 1, offsetX = 0, offsetY = 0;
-let draggingNode = null, panStart = null, panOffset = {x:0,y:0};
+let scale = 0.8, offsetX = 0, offsetY = 0;
+let draggingNode = null, panStart = null;
 let selectedNode = null;
 let time = 0;
 
-const COLORS = {
-  page:    '#00f5a0',
-  comp:    '#00d9f5',
-  route:   '#f5a000',
-  model:   '#f500b4',
-  core:    '#7b5ea7',
-  admin:   '#ff6b6b',
-};
+const ROYAL_BLUE = '#4169E1';
 
 const nodes = [
   // CORE HUBs
-  {id:'app',      label:'App.jsx',       type:'core',  group:'core',  x:0,   y:0,   r:28, info:'React root. Defines all routes via React Router DOM. Wraps app in AuthContext provider.'},
-  {id:'backend',  label:'index.js',      type:'core',  group:'core',  x:280, y:0,   r:26, info:'Express server entry. Connects MongoDB, loads all route files, configures CORS & JWT middleware.'},
-  {id:'mongodb',  label:'MongoDB',       type:'core',  group:'core',  x:500, y:0,   r:30, info:'Atlas cloud database. Stores users, workouts, meals, daily stats, and admin records.'},
+  {id:'app',      label:'App.jsx',       type:'Frontend Core',  x:0,   y:0,   r:30, info:'React application entry point. Handles routing and global state providers.'},
+  {id:'backend',  label:'index.js',      type:'Backend Core',   x:300, y:0,   r:28, info:'Main Express server file. Connects to MongoDB and initializes API routes.'},
+  {id:'mongodb',  label:'MongoDB',       type:'Database',       x:600, y:0,   r:35, info:'Database storage for users, workouts, meals, and statistics.'},
 
   // FRONTEND PAGES
-  {id:'login',    label:'Login',         type:'page',  group:'auth',  x:-200,y:-160, r:18, info:'JWT login form. Supports Google OAuth. Stores token in localStorage. Redirects to /dashboard.'},
-  {id:'signup',   label:'Signup',        type:'page',  group:'auth',  x:-280,y:-60,  r:18, info:'User registration with email verification trigger. Validates fields client-side.'},
-  {id:'forgot',   label:'ForgotPassword',type:'page',  group:'auth',  x:-310,y:60,   r:16, info:'Sends password reset email via backend /auth/forgot-password route.'},
-  {id:'reset',    label:'ResetPassword', type:'page',  group:'auth',  x:-260,y:160,  r:16, info:'Accepts reset token from URL params. Posts new password to /auth/reset-password.'},
-  {id:'verify',   label:'VerifyEmail',   type:'page',  group:'auth',  x:-150,y:200,  r:15, info:'Handles email verification token from URL. Activates account on success.'},
-  {id:'dashboard',label:'Dashboard',     type:'page',  group:'main',  x:-100,y:-220, r:22, info:'Main hub. Shows stats cards, workout chart, calorie ring, recent activity feed.'},
-  {id:'workouts', label:'Workouts',      type:'page',  group:'main',  x:20,  y:-240, r:18, info:'Log & view workouts. CRUD via /api/workouts. Filters by type/date.'},
-  {id:'nutrition',label:'Nutrition',     type:'page',  group:'main',  x:140, y:-220, r:18, info:'Meal tracker. Add meals with calories/macros. Fetches from /api/meals.'},
-  {id:'progress', label:'Progress',      type:'page',  group:'main',  x:200, y:-140, r:17, info:'Charts weight/calorie trends over time using DailyStats data.'},
-  {id:'profile',  label:'Profile',       type:'page',  group:'main',  x:200, y:-50,  r:18, info:'Edit user info, goals, avatar. Syncs with User model via /auth/update-profile.'},
-  {id:'admindash',label:'AdminDashboard',type:'admin', group:'admin', x:-60, y:200,  r:20, info:'Admin-only panel. View all users, manage accounts, see platform stats.'},
+  {id:'login',    label:'Login.jsx',         type:'Page',  x:-250, y:-150, r:20, info:'Handles user authentication and JWT token storage.'},
+  {id:'signup',   label:'Signup.jsx',        type:'Page',  x:-350, y:-50,  r:20, info:'User registration and email verification flow.'},
+  {id:'dashboard',label:'Dashboard.jsx',     type:'Page',  x:-150, y:-250, r:22, info:'Main user portal displaying summaries of fitness data.'},
+  {id:'workouts', label:'Workouts.jsx',      type:'Page',  x:50,   y:-250, r:20, info:'Interface for logging and managing exercise sessions.'},
+  {id:'nutrition',label:'Nutrition.jsx',     type:'Page',  x:200,  y:-250, r:20, info:'Meal tracking interface for calorie and macro management.'},
+  {id:'profile',  label:'Profile.jsx',       type:'Page',  x:250,  y:-150, r:20, info:'User settings and personal goal management.'},
+  {id:'admin',    label:'AdminDashboard.jsx',type:'Page',  x:0,    y:250,  r:22, info:'Administrative control panel for user management.'},
 
-  // COMPONENTS & CONTEXT
-  {id:'sidebar',  label:'Sidebar',       type:'comp',  group:'comp',  x:-20, y:-120, r:16, info:'Navigation sidebar. Links to Dashboard, Workouts, Nutrition, Progress, Profile. Shows user avatar.'},
-  {id:'layout',   label:'Layout',        type:'comp',  group:'comp',  x:80,  y:-120, r:15, info:'Wraps protected pages with Sidebar. Ensures consistent layout across main views.'},
-  {id:'authctx',  label:'AuthContext',   type:'comp',  group:'comp',  x:-140,y:-60,  r:18, info:'React Context. Stores user token & data globally. Provides login/logout functions to all components.'},
-
-  // BACKEND ROUTES
-  {id:'authR',    label:'authRoutes',    type:'route', group:'route', x:350, y:-160, r:18, info:'POST /register, /login, /forgot-password, /reset-password, /verify-email, /update-profile, /change-password.'},
-  {id:'workR',    label:'workoutRoutes', type:'route', group:'route', x:430, y:-100, r:17, info:'GET/POST/DELETE /api/workouts. Protected by authMiddleware JWT verification.'},
-  {id:'mealR',    label:'mealRoutes',    type:'route', group:'route', x:460, y:60,   r:17, info:'GET/POST/DELETE /api/meals. Stores meal name, calories, protein, carbs, fat.'},
-  {id:'statsR',   label:'statsRoutes',   type:'route', group:'route', x:410, y:140,  r:17, info:'GET/POST /api/stats. Tracks daily calorie intake, workouts done, weight.'},
-  {id:'adminR',   label:'adminRoutes',   type:'route', group:'route', x:310, y:180,  r:16, info:'GET /api/admin/users. Admin-only protected route. Lists all registered users.'},
+  // BACKEND LOGIC
+  {id:'authR',    label:'authRoutes.js',    type:'Route', x:350, y:-150, r:18, info:'API endpoints for login, signup, and password resets.'},
+  {id:'workR',    label:'workoutRoutes.js', type:'Route', x:450, y:-100, r:18, info:'API endpoints for workout CRUD operations.'},
+  {id:'mealR',    label:'mealRoutes.js',    type:'Route', x:450, y:100,  r:18, info:'API endpoints for meal and nutrition tracking.'},
+  {id:'statsR',   label:'statsRoutes.js',   type:'Route', x:350, y:150,  r:18, info:'API endpoints for fetching aggregated daily stats.'},
 
   // MODELS
-  {id:'userM',    label:'User',          type:'model', group:'model', x:600, y:-140, r:20, info:'Schema: name, email, password(hashed), avatar, fitnessGoal, resetToken, isVerified, createdAt.'},
-  {id:'workM',    label:'Workout',       type:'model', group:'model', x:660, y:-50,  r:17, info:'Schema: userId, type, duration, calories, date.'},
-  {id:'mealM',    label:'Meal',          type:'model', group:'model', x:670, y:60,   r:17, info:'Schema: userId, name, calories, protein, carbs, fat, date.'},
-  {id:'statsM',   label:'DailyStats',    type:'model', group:'model', x:640, y:160,  r:17, info:'Schema: userId, date, totalCalories, totalWorkouts, weight.'},
-  {id:'adminM',   label:'Admin',         type:'model', group:'model', x:560, y:210,  r:16, info:'Schema: email, password(hashed), role. Separate admin account model.'},
-
-  // MIDDLEWARE
-  {id:'mw',       label:'authMiddleware',type:'comp',  group:'mw',    x:390, y:20,   r:15, info:'Verifies JWT token on every protected route. Attaches req.user for downstream handlers.'},
+  {id:'userM',    label:'User.js',          type:'Model', x:650, y:-150, r:20, info:'Database schema for user accounts and preferences.'},
+  {id:'workM',    label:'Workout.js',       type:'Model', x:750, y:-50,  r:20, info:'Database schema for exercise records.'},
+  {id:'mealM',    label:'Meal.js',          type:'Model', x:750, y:50,   r:20, info:'Database schema for food and nutrition logs.'},
+  {id:'statsM',   label:'DailyStats.js',    type:'Model', x:650, y:150,  r:20, info:'Database schema for tracking daily progress metrics.'},
 ];
 
 const edges = [
   // App to pages
-  ['app','login'],['app','signup'],['app','forgot'],['app','reset'],['app','verify'],
-  ['app','dashboard'],['app','workouts'],['app','nutrition'],['app','progress'],['app','profile'],
-  ['app','admindash'],['app','authctx'],
-  // Components
-  ['layout','sidebar'],['dashboard','layout'],['workouts','layout'],['nutrition','layout'],
-  ['progress','layout'],['profile','layout'],
-  // AuthContext
-  ['authctx','login'],['authctx','signup'],['authctx','dashboard'],
-  // Backend entry
-  ['backend','authR'],['backend','workR'],['backend','mealR'],['backend','statsR'],['backend','adminR'],
-  ['backend','mongodb'],
-  // Middleware
-  ['mw','workR'],['mw','mealR'],['mw','statsR'],['mw','adminR'],
+  ['app','login'],['app','signup'],['app','dashboard'],['app','workouts'],['app','nutrition'],['app','profile'],['app','admin'],
+  // Backend to routes
+  ['backend','authR'],['backend','workR'],['backend','mealR'],['backend','statsR'],
   // Routes to models
-  ['authR','userM'],['workR','workM'],['mealR','mealM'],['statsR','statsM'],['adminR','adminM'],['adminR','userM'],
-  // Models to MongoDB
-  ['userM','mongodb'],['workM','mongodb'],['mealM','mongodb'],['statsM','mongodb'],['adminM','mongodb'],
-  // Frontend to backend (API calls)
-  ['login','authR'],['signup','authR'],['forgot','authR'],['reset','authR'],
-  ['workouts','workR'],['nutrition','mealR'],['progress','statsR'],['profile','authR'],['admindash','adminR'],
+  ['authR','userM'],['workR','workM'],['mealR','mealM'],['statsR','statsM'],
+  // Models to DB
+  ['userM','mongodb'],['workM','mongodb'],['mealM','mongodb'],['statsM','mongodb'],
+  // Frontend calls Backend (Lines of flow)
+  ['login','authR'],['signup','authR'],['dashboard','statsR'],['workouts','workR'],['nutrition','mealR'],['profile','authR'],['admin','authR']
 ];
 
-// Layout: center around middle of screen
-const cx = W/2 - 100, cy = H/2;
+const cx = W/2, cy = H/2;
 nodes.forEach(n=>{n.x = cx + n.x; n.y = cy + n.y; n.vx=0; n.vy=0;});
 
 function getNode(id){return nodes.find(n=>n.id===id);}
-function nodeColor(n){return COLORS[n.type]||'#fff';}
 
-// Simulation
 function simulate(){
-  const k=80, rep=3500;
+  const k=100, rep=4000;
   nodes.forEach(a=>{
     nodes.forEach(b=>{
       if(a===b)return;
       let dx=a.x-b.x, dy=a.y-b.y;
       let d=Math.sqrt(dx*dx+dy*dy)||1;
-      let f=rep/(d*d);
-      a.vx+=dx/d*f; a.vy+=dy/d*f;
+      if(d < 400) {
+          let f=rep/(d*d);
+          a.vx+=dx/d*f; a.vy+=dy/d*f;
+      }
     });
   });
   edges.forEach(([aid,bid])=>{
     let a=getNode(aid),b=getNode(bid);
     if(!a||!b)return;
     let dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)||1;
-    let f=(d-k*2)*0.01;
+    let f=(d-k)*0.03;
     a.vx+=dx/d*f; a.vy+=dy/d*f;
     b.vx-=dx/d*f; b.vy-=dy/d*f;
   });
   nodes.forEach(n=>{
     if(n===draggingNode)return;
-    n.vx*=0.85; n.vy*=0.85;
+    n.vx*=0.8; n.vy*=0.8;
     n.x+=n.vx; n.y+=n.vy;
   });
 }
 
-function drawGlow(x,y,r,col,alpha=0.3){
-  let g=ctx.createRadialGradient(x,y,0,x,y,r*3);
-  g.addColorStop(0,col.replace(')',`,${alpha})`).replace('rgb','rgba'));
-  g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=g;
-  ctx.beginPath();ctx.arc(x,y,r*3,0,Math.PI*2);ctx.fill();
-}
-
-function hexToRgb(hex){
-  let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return `${r},${g},${b}`;
-}
-
 function draw(){
-  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0,0,W,H);
+  
   ctx.save();
   ctx.translate(offsetX,offsetY);
   ctx.scale(scale,scale);
-  time+=0.012;
+  time+=0.01;
 
-  // Draw edges
+  // Draw Connections (White Lines)
   edges.forEach(([aid,bid])=>{
     let a=getNode(aid),b=getNode(bid);
     if(!a||!b)return;
-    let isHighlighted = selectedNode && (selectedNode.id===aid||selectedNode.id===bid);
-    let alpha = selectedNode ? (isHighlighted?0.8:0.08) : 0.25;
-    let col = isHighlighted ? '#00f5a0' : '#334466';
-    ctx.strokeStyle = isHighlighted
-      ? `rgba(0,245,160,${alpha})`
-      : `rgba(51,68,102,${alpha})`;
-    ctx.lineWidth = isHighlighted ? 1.5 : 0.8;
-    ctx.setLineDash(isHighlighted?[]:[4,6]);
-    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-    ctx.setLineDash([]);
-    // Animated particle
-    if(isHighlighted){
-      let t=(time*0.6)%1;
-      let px=a.x+(b.x-a.x)*t, py=a.y+(b.y-a.y)*t;
-      ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
-      ctx.fillStyle='rgba(0,245,160,0.9)'; ctx.fill();
-    }
+    
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.lineTo(b.x,b.y);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Connection flow animation
+    let t = (time * 0.5) % 1;
+    let px = a.x + (b.x - a.x) * t;
+    let py = a.y + (b.y - a.y) * t;
+    ctx.beginPath();
+    ctx.arc(px, py, 2, 0, Math.PI*2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
   });
 
-  // Draw nodes
+  // Draw Nodes (Royal Blue)
   nodes.forEach(n=>{
-    let col = nodeColor(n);
-    let rgb = hexToRgb(col);
-    let isSelected = selectedNode&&selectedNode.id===n.id;
-    let pulse = 1 + Math.sin(time*2 + n.x*0.01)*0.06;
-    let r = n.r * pulse;
-    let dimmed = selectedNode && !isSelected;
-
-    // Outer glow
-    if(!dimmed){
-      let g2=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*3.5);
-      g2.addColorStop(0,`rgba(${rgb},${isSelected?0.35:0.15})`);
-      g2.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(n.x,n.y,r*3.5,0,Math.PI*2); ctx.fill();
-    }
-
-    // Ring for selected
-    if(isSelected){
-      ctx.beginPath(); ctx.arc(n.x,n.y,r+8,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(${rgb},0.7)`; ctx.lineWidth=2;
-      ctx.stroke();
-      ctx.beginPath(); ctx.arc(n.x,n.y,r+14,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(${rgb},0.3)`; ctx.lineWidth=1;
-      ctx.stroke();
-    }
+    // Glow effect
+    let g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 2);
+    g.addColorStop(0, 'rgba(65, 105, 225, 0.3)');
+    g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r * 2, 0, Math.PI*2);
+    ctx.fill();
 
     // Node body
-    let grad=ctx.createRadialGradient(n.x-r*0.3,n.y-r*0.3,0,n.x,n.y,r*1.2);
-    grad.addColorStop(0,`rgba(${rgb},${dimmed?0.2:0.9})`);
-    grad.addColorStop(0.5,`rgba(${rgb},${dimmed?0.1:0.6})`);
-    grad.addColorStop(1,`rgba(${rgb},${dimmed?0.05:0.2})`);
-    ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2);
-    ctx.fillStyle=grad; ctx.fill();
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+    ctx.fillStyle = ROYAL_BLUE;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-    // Border
-    ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2);
-    ctx.strokeStyle=`rgba(${rgb},${dimmed?0.2:0.8})`; ctx.lineWidth=1.5; ctx.stroke();
-
-    // Label
-    ctx.fillStyle=dimmed?'rgba(255,255,255,0.2)':'rgba(255,255,255,0.95)';
-    ctx.font=`${Math.max(9,r*0.55)}px Inter`;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(n.label,n.x,n.y+r+12);
+    // Text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 12px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText(n.label, n.x, n.y + n.r + 20);
   });
 
   ctx.restore();
   requestAnimationFrame(draw);
 }
 
-// Interactions
-let simSteps=0;
-function simLoop(){simulate(); simSteps++; if(simSteps<300)requestAnimationFrame(simLoop);}
-simLoop();
+setInterval(simulate, 1000/60);
 draw();
 
 function toWorld(cx,cy){
@@ -272,49 +202,38 @@ function toWorld(cx,cy){
 
 canvas.addEventListener('mousedown',e=>{
   let {x,y}=toWorld(e.clientX,e.clientY);
-  let hit=nodes.find(n=>Math.hypot(n.x-x,n.y-y)<n.r+4);
+  let hit=nodes.find(n=>Math.hypot(n.x-x,n.y-y)<n.r*1.5);
   if(hit){draggingNode=hit;}
   else{panStart={x:e.clientX-offsetX,y:e.clientY-offsetY};}
 });
 canvas.addEventListener('mousemove',e=>{
   if(draggingNode){
     let {x,y}=toWorld(e.clientX,e.clientY);
-    draggingNode.x=x; draggingNode.y=y; draggingNode.vx=0; draggingNode.vy=0;
+    draggingNode.x=x; draggingNode.y=y;
   } else if(panStart){
     offsetX=e.clientX-panStart.x; offsetY=e.clientY-panStart.y;
   }
-  // Tooltip
+  
   let {x,y}=toWorld(e.clientX,e.clientY);
-  let hit=nodes.find(n=>Math.hypot(n.x-x,n.y-y)<n.r+4);
+  let hit=nodes.find(n=>Math.hypot(n.x-x,n.y-y)<n.r*1.5);
   let tt=document.getElementById('tooltip');
   if(hit){
     tt.style.display='block';
-    tt.style.left=(e.clientX+16)+'px'; tt.style.top=(e.clientY-10)+'px';
-    document.getElementById('tt-type').textContent=hit.type.toUpperCase();
-    document.getElementById('tt-type').style.color=nodeColor(hit);
+    tt.style.left=(e.clientX+15)+'px'; tt.style.top=(e.clientY+15)+'px';
+    document.getElementById('tt-type').textContent=hit.type;
     document.getElementById('tt-title').textContent=hit.label;
-    document.getElementById('tt-title').style.color=nodeColor(hit);
     document.getElementById('tt-desc').textContent=hit.info;
   } else {tt.style.display='none';}
 });
-canvas.addEventListener('mouseup',e=>{
-  if(!draggingNode && panStart){
-    let {x,y}=toWorld(e.clientX,e.clientY);
-  }
-  if(draggingNode){draggingNode=null; return;}
-  panStart=null;
-  let {x,y}=toWorld(e.clientX,e.clientY);
-  let hit=nodes.find(n=>Math.hypot(n.x-x,n.y-y)<n.r+4);
-  selectedNode = (hit&&selectedNode!==hit)?hit:null;
+window.addEventListener('mouseup',()=>{draggingNode=null; panStart=null;});
+window.addEventListener('wheel',e=>{
+  let factor=e.deltaY<0?1.1:0.9;
+  scale*=factor; scale=Math.max(0.2,Math.min(2,scale));
 });
-canvas.addEventListener('wheel',e=>{
-  e.preventDefault();
-  let factor=e.deltaY<0?1.12:0.88;
-  let mx=e.clientX,my=e.clientY;
-  offsetX=mx-(mx-offsetX)*factor;
-  offsetY=my-(my-offsetY)*factor;
-  scale*=factor; scale=Math.min(3,Math.max(0.3,scale));
-});
+window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight;});
+</script>
+</body>
+</html>
 window.addEventListener('resize',()=>{
   W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight;
 });
