@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Users, Shield, Trash2, Ban, Eye, CheckCircle, XCircle, BarChart, ExternalLink, Mail, UserCheck } from 'lucide-react';
+import { Users, Shield, Trash2, Ban, Eye, CheckCircle, XCircle, BarChart, ExternalLink, Mail, UserCheck, Search, Globe, Terminal } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const AdminDashboard = () => {
