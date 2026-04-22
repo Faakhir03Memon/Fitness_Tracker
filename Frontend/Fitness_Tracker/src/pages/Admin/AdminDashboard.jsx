@@ -60,10 +60,10 @@ const AdminDashboard = () => {
         }
     };
 
-    const viewLogs = async (userId) => {
+    const viewLogs = async (u) => {
         try {
-            const res = await axios.get(`${API_BASE_URL}/api/admin/users/${userId}/logs`, authConfig);
-            setSelectedUserLogs(res.data);
+            const res = await axios.get(`${API_BASE_URL}/api/admin/users/${u._id}/logs`, authConfig);
+            setSelectedUserLogs({ ...res.data, profile: u });
         } catch (err) {
             console.error(err);
         }
@@ -204,14 +204,23 @@ const AdminDashboard = () => {
                                 <h3>User Activity Profile</h3>
                                 <button onClick={() => setSelectedUserLogs(null)} className="close-btn">×</button>
                             </div>
-                            <div className="logs-content">
+                            <div className="logs-content" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                                 <div className="log-col">
                                     <h4>Workouts</h4>
-                                    {selectedUserLogs.workouts.length > 0 ? selectedUserLogs.workouts.map((w,i)=><div key={i} className="log-item">{w.type} - {w.duration} min</div>) : <p>None</p>}
+                                    {selectedUserLogs.workouts.length > 0 ? selectedUserLogs.workouts.map((w,i)=><div key={i} className="log-item">{w.type} - {w.duration} min</div>) : <p className="empty-text">No workouts</p>}
                                 </div>
                                 <div className="log-col">
                                     <h4>Meals</h4>
-                                    {selectedUserLogs.meals.length > 0 ? selectedUserLogs.meals.map((m,i)=><div key={i} className="log-item">{m.foodName} - {m.calories} kcal</div>) : <p>None</p>}
+                                    {selectedUserLogs.meals.length > 0 ? selectedUserLogs.meals.map((m,i)=><div key={i} className="log-item">{m.foodName} - {m.calories} kcal</div>) : <p className="empty-text">No meals</p>}
+                                </div>
+                                <div className="log-col">
+                                    <h4>Daily Stats</h4>
+                                    {selectedUserLogs.stats && selectedUserLogs.stats.length > 0 ? selectedUserLogs.stats.map((s,i)=>(
+                                        <div key={i} className="log-item" style={{borderColor: 'rgba(0, 255, 137, 0.2)'}}>
+                                            <div style={{fontSize: '10px', color: '#00ff89', marginBottom: '4px'}}>{new Date(s.date).toLocaleDateString()}</div>
+                                            <div>{s.steps.toLocaleString()} steps | {s.water}L water</div>
+                                        </div>
+                                    )) : <p className="empty-text">No stats</p>}
                                 </div>
                             </div>
                         </div>
@@ -269,6 +278,7 @@ const AdminDashboard = () => {
                 .logs-content { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
                 .log-col h4 { font-size: 12px; color: #64748b; margin-bottom: 15px; text-transform: uppercase; }
                 .log-item { background: #070b14; padding: 12px; border-radius: 12px; margin-bottom: 8px; font-size: 13px; border: 1px solid #1e293b; }
+                .empty-text { font-size: 12px; color: #475569; font-style: italic; }
 
                 .animate-fade-in { animation: fadeIn 0.4s ease-out; }
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
