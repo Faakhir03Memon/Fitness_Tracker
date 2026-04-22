@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from '../api/config';
 import { useAuth } from '../context/AuthContext';
 import { Lock, ShieldCheck } from 'lucide-react';
 
@@ -25,7 +26,7 @@ const ResetPassword = () => {
         setLoading(true);
         setError('');
         try {
-            await axios.post(`http://localhost:5000/api/auth/reset-password/${token}`, { password });
+            await axios.post(`${API_BASE_URL}/api/auth/reset-password/${token}`, { password });
             
             // Logout the user to clear any old session before redirecting to login
             logout();

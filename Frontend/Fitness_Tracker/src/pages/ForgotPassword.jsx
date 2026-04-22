@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from '../api/config';
 import { Mail, ArrowLeft, SendHorizonal } from 'lucide-react';
 
 const ForgotPassword = () => {
@@ -16,7 +17,7 @@ const ForgotPassword = () => {
         setError('');
         setDevLink('');
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
+            const { data } = await axios.post(`${API_BASE_URL}/api/auth/forgot-password`, { email });
             if (data.devLink) setDevLink(data.devLink);
             setSent(true);
         } catch (err) {
