@@ -9,15 +9,38 @@ const Signup = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [captcha, setCaptcha] = useState('');
+    const [captchaInput, setCaptchaInput] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
     const navigate = useNavigate();
 
+    const generateCaptcha = () => {
+        const charSet = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // Removed O, I, 0, 1 for clarity
+        let result = '';
+        for (let i = 0; i < 5; i++) {
+            result += charSet.charAt(Math.floor(Math.random() * charSet.length));
+        }
+        setCaptcha(result);
+    };
+
+    React.useEffect(() => {
+        generateCaptcha();
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (captchaInput.toUpperCase() !== captcha) {
+            setError('Invalid security code. Please try again.');
+            generateCaptcha();
+            setCaptchaInput('');
+            return;
+        }
+
         setLoading(true);
         try {
             const { data } = await axios.post(`${API_BASE_URL}/api/auth/signup`, { name, email, password });
@@ -25,6 +48,7 @@ const Signup = () => {
             setSubmitted(true);
         } catch (err) {
             setError(err.response?.data?.message || 'Error occurred during signup');
+            generateCaptcha();
         } finally {
             setLoading(false);
         }
@@ -102,6 +126,32 @@ const Signup = () => {
                             <input type="password" placeholder="Create a strong password" value={password} onChange={(e) => setPassword(e.target.value)} required
                                 style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
                         </div>
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>SECURITY CODE</label>
+                        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                            <div onClick={generateCaptcha} style={{ 
+                                flex: 1, height: '48px', background: 'linear-gradient(45deg, #0f172a, #1e293b)', 
+                                border: '1px dashed #334155', borderRadius: '12px', display: 'flex', 
+                                alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                position: 'relative', overflow: 'hidden'
+                            }}>
+                                <div style={{ position: 'absolute', inset: 0, opacity: 0.1, background: 'repeating-linear-gradient(45deg, #00ff89, #00ff89 2px, transparent 2px, transparent 10px)' }}></div>
+                                <span style={{ 
+                                    fontFamily: 'Bebas Neue', fontSize: '24px', letterSpacing: '8px', 
+                                    color: '#00ff89', textShadow: '0 0 10px rgba(0,255,137,0.3)',
+                                    userSelect: 'none', fontStyle: 'italic', position: 'relative'
+                                }}>{captcha}</span>
+                            </div>
+                            <input type="text" placeholder="Enter Code" value={captchaInput} onChange={(e) => setCaptchaInput(e.target.value)} required
+                                style={{ 
+                                    width: '130px', background: '#080c10', border: '1px solid #1f2937', 
+                                    borderRadius: '12px', padding: '14px', color: 'white', outline: 'none', 
+                                    textAlign: 'center', fontWeight: '800', letterSpacing: '2px'
+                                }} />
+                        </div>
+                        <p style={{ fontSize: '10px', color: '#475569', marginTop: '8px', textAlign: 'center' }}>Click the code to refresh</p>
                     </div>
 
                     {error && (
