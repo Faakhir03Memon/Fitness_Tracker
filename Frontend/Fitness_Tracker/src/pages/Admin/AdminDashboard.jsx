@@ -13,7 +13,13 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
     const [view, setView] = useState('dashboard'); // 'dashboard' or 'users'
     const [globalStats, setGlobalStats] = useState({ totalUsers: 0, totalWorkouts: 0, totalMeals: 0 });
-// ...
+    const [usersList, setUsersList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedUserLogs, setSelectedUserLogs] = useState(null);
+
+    const authConfig = {
+        headers: { Authorization: `Bearer ${user.token}` }
+    };
     useEffect(() => {
         fetchGlobalStats();
         if (view === 'users') {
