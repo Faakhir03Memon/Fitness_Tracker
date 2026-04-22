@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import { Lock, ShieldCheck } from 'lucide-react';
 
 const ResetPassword = () => {
     const { token } = useParams();
     const navigate = useNavigate();
+    const { logout } = useAuth();
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
     const [loading, setLoading] = useState(false);
@@ -24,6 +26,10 @@ const ResetPassword = () => {
         setError('');
         try {
             await axios.post(`http://localhost:5000/api/auth/reset-password/${token}`, { password });
+            
+            // Logout the user to clear any old session before redirecting to login
+            logout();
+            
             setSuccess(true);
             setTimeout(() => navigate('/login'), 3000);
         } catch (err) {
