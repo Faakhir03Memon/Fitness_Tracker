@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api/config';
 import { Mail, Lock, ShieldCheck } from 'lucide-react';
 
 const Login = () => {
@@ -19,7 +20,7 @@ const Login = () => {
         setNotVerified(false);
         setLoading(true);
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+            const { data } = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
             login(data);
             if (data.role === 'admin') navigate('/admin');
             else navigate('/');
