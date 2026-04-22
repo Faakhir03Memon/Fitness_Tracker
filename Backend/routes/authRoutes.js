@@ -35,26 +35,21 @@ router.post('/signup', async (req, res) => {
             name,
             email,
             password,
-            // Auto-verify if email not configured (dev/testing mode)
-            isVerified: !emailConfigured,
-            verificationToken: emailConfigured ? verificationToken : undefined
+            isVerified: true, // Auto-verify enabled
+            verificationToken: undefined
         });
 
         if (emailConfigured) {
-            // Try to send verification email
+            // Try to send a welcome email (optional)
             try {
-                await sendVerificationEmail(email, name, verificationToken);
+                await sendVerificationEmail(email, name, 'welcome'); // Just a welcome placeholder
                 return res.status(201).json({
-                    message: 'Account created! Please check your email to verify your account before logging in.',
+                    message: 'Account created successfully! You can login now.',
                     emailSent: true
                 });
             } catch (emailErr) {
-                // Email failed - auto-verify user so they can still login
-                user.isVerified = true;
-                user.verificationToken = undefined;
-                await user.save();
                 return res.status(201).json({
-                    message: 'Account created successfully! Email service unavailable, but you can login now.',
+                    message: 'Account created successfully! You can login now.',
                     emailSent: false
                 });
             }
