@@ -48,9 +48,13 @@ router.delete('/users/:id', protect, adminOnly, async (req, res) => {
 // Get user detailed logs
 router.get('/users/:id/logs', protect, adminOnly, async (req, res) => {
     try {
-        const workouts = await Workout.find({ user: req.params.id }).limit(10);
-        const meals = await Meal.find({ user: req.params.id }).limit(10);
-        const stats = await DailyStats.find({ user: req.params.id }).sort({ date: -1 }).limit(7);
+        const mongoose = require('mongoose');
+        const userId = new mongoose.Types.ObjectId(req.params.id);
+        
+        const workouts = await Workout.find({ user: userId }).sort({ date: -1 }).limit(10);
+        const meals = await Meal.find({ user: userId }).sort({ date: -1 }).limit(10);
+        const stats = await DailyStats.find({ user: userId }).sort({ date: -1 }).limit(7);
+        
         res.json({ workouts, meals, stats });
     } catch (err) {
         res.status(500).json({ message: err.message });
