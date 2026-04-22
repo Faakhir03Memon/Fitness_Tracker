@@ -184,7 +184,7 @@ const AdminDashboard = () => {
                                             </td>
                                             <td>
                                                 <div className="admin-table-actions">
-                                                    <button onClick={() => viewLogs(u._id)} className="icon-btn" title="View Logs"><BarChart size={16}/></button>
+                                                    <button onClick={() => viewLogs(u)} className="icon-btn" title="View Logs"><BarChart size={16}/></button>
                                                     <button onClick={() => handleToggleBan(u._id, u.isBanned)} className="icon-btn ban-btn" title="Ban User"><Ban size={16}/></button>
                                                     <button onClick={() => handleDeleteUser(u._id)} className="icon-btn delete-btn" title="Kick User"><Trash2 size={16}/></button>
                                                 </div>
@@ -204,7 +204,30 @@ const AdminDashboard = () => {
                                 <h3>User Activity Profile</h3>
                                 <button onClick={() => setSelectedUserLogs(null)} className="close-btn">×</button>
                             </div>
-                            <div className="logs-content" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                                <div className="profile-details-banner" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '15px', background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '16px', marginBottom: '30px', border: '1px solid #1e293b' }}>
+                                    <div className="profile-stat">
+                                        <span className="p-label">AGE</span>
+                                        <span className="p-val">{selectedUserLogs.profile.age || '--'} yrs</span>
+                                    </div>
+                                    <div className="profile-stat">
+                                        <span className="p-label">GENDER</span>
+                                        <span className="p-val">{selectedUserLogs.profile.gender?.toUpperCase() || '--'}</span>
+                                    </div>
+                                    <div className="profile-stat">
+                                        <span className="p-label">WEIGHT</span>
+                                        <span className="p-val">{selectedUserLogs.profile.weight || '--'} kg</span>
+                                    </div>
+                                    <div className="profile-stat">
+                                        <span className="p-label">HEIGHT</span>
+                                        <span className="p-val">{selectedUserLogs.profile.height || '--'} cm</span>
+                                    </div>
+                                    <div className="profile-stat">
+                                        <span className="p-label">JOINED</span>
+                                        <span className="p-val">{new Date(selectedUserLogs.profile.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+
+                                <div className="logs-content" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                                 <div className="log-col">
                                     <h4>Workouts</h4>
                                     {selectedUserLogs.workouts.length > 0 ? selectedUserLogs.workouts.map((w,i)=><div key={i} className="log-item">{w.type} - {w.duration} min</div>) : <p className="empty-text">No workouts</p>}
@@ -279,6 +302,10 @@ const AdminDashboard = () => {
                 .log-col h4 { font-size: 12px; color: #64748b; margin-bottom: 15px; text-transform: uppercase; }
                 .log-item { background: #070b14; padding: 12px; border-radius: 12px; margin-bottom: 8px; font-size: 13px; border: 1px solid #1e293b; }
                 .empty-text { font-size: 12px; color: #475569; font-style: italic; }
+                
+                .profile-stat { display: flex; flex-direction: column; gap: 5px; }
+                .p-label { font-size: 9px; font-weight: 800; color: #64748b; letter-spacing: 1px; }
+                .p-val { font-size: 14px; font-weight: 700; color: #00ff89; }
 
                 .animate-fade-in { animation: fadeIn 0.4s ease-out; }
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
