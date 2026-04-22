@@ -6,7 +6,7 @@ import {
     UserPlus, Mail, Lock, User, RefreshCw, CheckCircle2, ShieldCheck, X,
     Dumbbell, Flame, Activity, Heart, Apple, Timer, Zap, Star, Coffee, 
     Smartphone, Bike, Trophy, Target, Salad, ZapOff, Utensils, Footprints,
-    Brain, Droplets, Moon, Sun, Anchor, Award, Camera, Music, Map
+    Brain, Droplets, Moon, Sun, Anchor, Award, Camera, Music, Map, Ruler, Weight, Calendar
 } from 'lucide-react';
 import API_BASE_URL from '../api/config';
 
@@ -14,6 +14,9 @@ const Signup = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [weight, setWeight] = useState('');
+    const [height, setHeight] = useState('');
+    const [age, setAge] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -109,7 +112,9 @@ const Signup = () => {
 
         setLoading(true);
         try {
-            const { data } = await axios.post(`${API_BASE_URL}/api/auth/signup`, { name, email, password });
+            const { data } = await axios.post(`${API_BASE_URL}/api/auth/signup`, { 
+                name, email, password, weight, height, age 
+            });
             setEmailSent(data.emailSent);
             setSubmitted(true);
         } catch (err) {
@@ -176,6 +181,34 @@ const Signup = () => {
                         <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
                             <Lock size={18} color="#475569" style={{ marginRight: '15px' }} />
                             <input type="password" placeholder="Create a strong password" value={password} onChange={(e) => setPassword(e.target.value)} required
+                                style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>WEIGHT (KG)</label>
+                            <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
+                                <Weight size={18} color="#475569" style={{ marginRight: '15px' }} />
+                                <input type="number" placeholder="0.0" value={weight} onChange={(e) => setWeight(e.target.value)}
+                                    style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
+                            </div>
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>HEIGHT (CM)</label>
+                            <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
+                                <Ruler size={18} color="#475569" style={{ marginRight: '15px' }} />
+                                <input type="number" placeholder="0" value={height} onChange={(e) => setHeight(e.target.value)}
+                                    style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>AGE (YEARS)</label>
+                        <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
+                            <Calendar size={18} color="#475569" style={{ marginRight: '15px' }} />
+                            <input type="number" placeholder="Enter your age" value={age} onChange={(e) => setAge(e.target.value)}
                                 style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
                         </div>
                     </div>
