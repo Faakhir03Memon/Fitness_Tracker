@@ -170,11 +170,25 @@ router.post('/forgot-password', async (req, res) => {
         user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
         await user.save();
 
-        await sendPasswordResetEmail(email, user.name, resetToken);
+        // Check if email is configured
+        const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
 
-        res.json({ message: 'Password reset link has been sent to your email.' });
+        if (emailConfigured) {
+            await sendPasswordResetEmail(email, user.name, resetToken);
+            res.json({ message: 'Password reset link has been sent to your email.' });
+        } else {
+            const devLink = `http://localhost:5173/reset-password/${resetToken}`;
+            console.log('--- DEVELOPMENT MODE: PASSWORD RESET LINK ---');
+            console.log(devLink);
+            console.log('--------------------------------------------');
+            res.json({ 
+                message: 'Email service is not configured in .env, but for testing purposes, the reset link has been generated.',
+                devLink: devLink // Returning it for easier testing by the user
+            });
+        }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Forgot password error:', error);
+        res.status(500).json({ message: 'Error processing request. Please check server logs.' });
     }
 });
 

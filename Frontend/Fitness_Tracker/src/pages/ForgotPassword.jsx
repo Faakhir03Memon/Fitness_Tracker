@@ -7,14 +7,17 @@ const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
+    const [devLink, setDevLink] = useState('');
     const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+        setDevLink('');
         try {
-            await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
+            const { data } = await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
+            if (data.devLink) setDevLink(data.devLink);
             setSent(true);
         } catch (err) {
             setError(err.response?.data?.message || 'Something went wrong.');
@@ -98,6 +101,15 @@ const ForgotPassword = () => {
                             We've sent a password reset link to:
                         </p>
                         <p style={{ color: '#f59e0b', fontWeight: '800', marginBottom: '30px' }}>{email}</p>
+                        
+                        {devLink && (
+                            <div style={{ background: 'rgba(0, 255, 137, 0.05)', border: '1px dashed #00ff89', padding: '20px', borderRadius: '15px', marginBottom: '30px' }}>
+                                <p style={{ color: '#00ff89', fontSize: '12px', fontWeight: '800', marginBottom: '10px' }}>DEV MODE: TEST LINK GENERATED</p>
+                                <a href={devLink} style={{ color: 'white', fontSize: '13px', wordBreak: 'break-all' }}>{devLink}</a>
+                                <p style={{ color: '#64748b', fontSize: '11px', marginTop: '10px' }}>Since EMAIL_USER is not set in .env, use this link to test the reset flow.</p>
+                            </div>
+                        )}
+
                         <p style={{ color: '#475569', fontSize: '12px', marginBottom: '30px' }}>
                             The link expires in 1 hour. Check your spam folder if you don't see it.
                         </p>
