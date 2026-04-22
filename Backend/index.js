@@ -44,14 +44,28 @@ mongoose.connect(process.env.MONGODB_URI)
 
     // Seed Admin User
     const adminEmail = 'fit@admin.com';
-    const adminExists = await Admin.findOne({ email: adminEmail });
-    if (!adminExists) {
-        await Admin.create({
-            name: 'Mymn SaaB',
-            email: adminEmail,
-            password: 'F1it@access.com'
-        });
-        console.log('Admin user Mymn SaaB seeded successfully');
+    const adminPassword = 'F1it@access.com';
+    
+    try {
+        const adminExists = await Admin.findOne({ email: adminEmail });
+        if (!adminExists) {
+            await Admin.create({
+                name: 'Mymn SaaB',
+                email: adminEmail,
+                password: adminPassword
+            });
+            console.log('Admin user Mymn SaaB seeded successfully');
+        } else {
+            // Update password if it doesn't match the required one (optional but good for debugging)
+            const isMatch = await adminExists.comparePassword(adminPassword);
+            if (!isMatch) {
+                adminExists.password = adminPassword;
+                await adminExists.save();
+                console.log('Admin password updated to match F1it@access.com');
+            }
+        }
+    } catch (err) {
+        console.error('Error seeding admin:', err);
     }
 
     app.listen(PORT, () => {

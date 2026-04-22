@@ -18,25 +18,40 @@ import './App.css';
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
-  return user ? children : <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" />;
+  if (user.role === 'admin') return <Navigate to="/admin" />;
+  return children;
 };
 
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
-  return user && user.role === 'admin' ? children : <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" />;
+  if (user.role !== 'admin') return <Navigate to="/" />;
+  return children;
 };
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
-  return user ? <Navigate to="/" /> : children;
+  if (user) {
+    return user.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/" />;
+  }
+  return children;
+};
+
+const HomeRedirect = () => {
+  const { user, loading } = useAuth();
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <Navigate to="/login" />;
+  return user.role === 'admin' ? <Navigate to="/admin" /> : <Layout><Dashboard /></Layout>;
 };
 
 const FallbackRoute = () => {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
-  return user ? <Navigate to="/" /> : <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" />;
+  return user.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/" />;
 };
 
 function App() {
@@ -52,7 +67,7 @@ function App() {
           <Route path="/verify-email/:token" element={<PublicRoute><VerifyEmail /></PublicRoute>} />
 
           {/* Protected User Routes */}
-          <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+          <Route path="/" element={<HomeRedirect />} />
           <Route path="/workouts" element={<ProtectedRoute><Layout><Workouts /></Layout></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><Layout><Progress /></Layout></ProtectedRoute>} />
           <Route path="/nutrition" element={<ProtectedRoute><Layout><Nutrition /></Layout></ProtectedRoute>} />

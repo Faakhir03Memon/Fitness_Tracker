@@ -226,6 +226,11 @@ const Nutrition = () => {
                 .rec-food { font-weight: 700; color: white; font-size: 16px; margin-bottom: 5px; }
                 .rec-stats { font-size: 12px; color: var(--accent-green); font-weight: 600; display: flex; gap: 12px; }
 
+                .btn-primary { background: var(--accent-green); color: black; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 255, 137, 0.2); }
+                .btn-primary:hover { background: #00d170; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 255, 137, 0.4); }
+                .btn-cancel { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); font-weight: 800; cursor: pointer; transition: 0.3s; }
+                .btn-cancel:hover { background: #ef4444; color: white; }
+
                 .search-input-wrap { display: flex; align-items: center; gap: 15px; background: #080c10; border: 1px solid var(--border); padding: 15px 25px; border-radius: 18px; margin-bottom: 20px; }
                 .search-input-wrap input { background: none; border: none; color: white; width: 100%; outline: none; font-size: 16px; }
                 

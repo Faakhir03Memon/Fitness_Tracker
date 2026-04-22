@@ -95,26 +95,36 @@ router.get('/verify-email/:token', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required.' });
+    }
+
     try {
         // First check in Admin table
         const admin = await Admin.findOne({ email });
-        if (admin && (await admin.comparePassword(password))) {
-            return res.json({
-                _id: admin._id,
-                email: admin.email,
-                role: 'admin',
-                token: generateToken(admin._id, 'admin'),
-            });
+        if (admin) {
+            const isMatch = await admin.comparePassword(password);
+            if (isMatch) {
+                return res.json({
+                    _id: admin._id,
+                    email: admin.email,
+                    role: 'admin',
+                    token: generateToken(admin._id, 'admin'),
+                });
+            } else {
+                return res.status(401).json({ message: 'Incorrect admin password.' });
+            }
         }
 
         // Then check in User table
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(401).json({ message: 'No account found with this email.' });
+            return res.status(401).json({ message: 'No account found with this email. Please sign up first.' });
         }
 
-        if (!(await user.comparePassword(password))) {
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
             return res.status(401).json({ message: 'Incorrect password. Please try again.' });
         }
 
@@ -127,7 +137,7 @@ router.post('/login', async (req, res) => {
         }
 
         if (user.isBanned) {
-            return res.status(403).json({ message: 'Your account has been suspended.' });
+            return res.status(403).json({ message: 'Your account has been suspended by an admin.' });
         }
 
         return res.json({
@@ -138,7 +148,8 @@ router.post('/login', async (req, res) => {
             token: generateToken(user._id),
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Server error during login. Please try again later.' });
     }
 });
 
