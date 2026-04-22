@@ -238,18 +238,24 @@ const AdminDashboard = () => {
                                 <div className="logs-content" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                                 <div className="log-col">
                                     <h4>Workouts</h4>
-                                    {selectedUserLogs.workouts.length > 0 ? selectedUserLogs.workouts.map((w,i)=><div key={i} className="log-item">{w.type} - {w.duration} min</div>) : <p className="empty-text">No workouts</p>}
+                                    {selectedUserLogs.workouts.length > 0 ? selectedUserLogs.workouts.map((w,i)=>(
+                                        <div key={i} className="log-item">
+                                            <div style={{fontWeight: '700'}}>{w.type}</div>
+                                            <div style={{fontSize: '11px', color: '#94a3b8'}}>{w.duration} mins • {w.calories} kcal</div>
+                                        </div>
+                                    )) : <p className="empty-text">No workouts</p>}
                                 </div>
                                 <div className="log-col">
                                     <h4>Meals</h4>
                                     {selectedUserLogs.meals.length > 0 ? selectedUserLogs.meals.map((m,i)=><div key={i} className="log-item">{m.foodName} - {m.calories} kcal</div>) : <p className="empty-text">No meals</p>}
                                 </div>
                                 <div className="log-col">
-                                    <h4>Daily Stats</h4>
+                                    <h4>Daily Totals</h4>
                                     {selectedUserLogs.stats && selectedUserLogs.stats.length > 0 ? selectedUserLogs.stats.map((s,i)=>(
                                         <div key={i} className="log-item" style={{borderColor: 'rgba(0, 255, 137, 0.2)'}}>
                                             <div style={{fontSize: '10px', color: '#00ff89', marginBottom: '4px'}}>{new Date(s.date).toLocaleDateString()}</div>
-                                            <div>{s.steps.toLocaleString()} steps | {s.water}L water</div>
+                                            <div style={{fontWeight: '600'}}>{s.caloriesBurned} kcal | {s.activeMinutes} mins</div>
+                                            <div style={{fontSize: '11px', color: '#64748b'}}>{s.steps.toLocaleString()} steps | {s.water}L water</div>
                                         </div>
                                     )) : <p className="empty-text">No stats</p>}
                                 </div>
