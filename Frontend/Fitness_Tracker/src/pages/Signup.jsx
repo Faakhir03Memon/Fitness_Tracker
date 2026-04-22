@@ -2,73 +2,92 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { UserPlus, Mail, Lock, User, Dumbbell, Flame, Activity, Heart, Apple, Timer, Zap, Star, Coffee, Smartphone, RefreshCw } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, RefreshCw, CheckCircle2, ShieldCheck, X } from 'lucide-react';
 import API_BASE_URL from '../api/config';
 
 const Signup = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [captchaGrid, setCaptchaGrid] = useState([]);
-    const [targetIconName, setTargetIconName] = useState('');
-    const [selectedIndices, setSelectedIndices] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
+    
+    // Captcha States
+    const [showCaptcha, setShowCaptcha] = useState(false);
+    const [isVerified, setIsVerified] = useState(false);
+    const [captchaGrid, setCaptchaGrid] = useState([]);
+    const [targetCategory, setTargetCategory] = useState('');
+    const [selectedIndices, setSelectedIndices] = useState([]);
+    const [captchaError, setCaptchaError] = useState('');
+
     const navigate = useNavigate();
 
-    const ICON_POOL = [
-        { name: 'Dumbbell', icon: <Dumbbell size={24} /> },
-        { name: 'Flame', icon: <Flame size={24} /> },
-        { name: 'Activity', icon: <Activity size={24} /> },
-        { name: 'Heart', icon: <Heart size={24} /> },
-        { name: 'Apple', icon: <Apple size={24} /> },
-        { name: 'Timer', icon: <Timer size={24} /> },
-        { name: 'Zap', icon: <Zap size={24} /> },
-        { name: 'Star', icon: <Star size={24} /> },
-        { name: 'Coffee', icon: <Coffee size={24} /> },
-        { name: 'Smartphone', icon: <Smartphone size={24} /> },
+    const IMAGE_CATEGORIES = [
+        { name: 'Dumbbells', keywords: ['dumbbell', 'weights', 'gym equipment'] },
+        { name: 'Healthy Food', keywords: ['salad', 'healthy food', 'fruit'] },
+        { name: 'Yoga', keywords: ['yoga', 'meditation', 'stretching'] },
+        { name: 'Running', keywords: ['running', 'jogging', 'marathon'] }
     ];
 
     const generateCaptcha = () => {
-        const target = ICON_POOL[Math.floor(Math.random() * 3)]; // Target is one of the first 3 (Fitness related)
-        setTargetIconName(target.name);
+        const target = IMAGE_CATEGORIES[Math.floor(Math.random() * IMAGE_CATEGORIES.length)];
+        setTargetCategory(target.name);
         
         let grid = [];
         let targetCount = 0;
         
         for (let i = 0; i < 9; i++) {
-            const isTarget = Math.random() > 0.7;
+            const isTarget = Math.random() > 0.6;
             if (isTarget) {
-                grid.push(target);
+                const keyword = target.keywords[Math.floor(Math.random() * target.keywords.length)];
+                grid.push({ 
+                    category: target.name, 
+                    url: `https://images.unsplash.com/photo-${1517836357463 + i + Math.floor(Math.random() * 1000)}?auto=format&fit=crop&w=150&q=60&sig=${Math.random()}&${keyword}`
+                });
                 targetCount++;
             } else {
-                let randomIcon;
+                let otherCat;
                 do {
-                    randomIcon = ICON_POOL[Math.floor(Math.random() * ICON_POOL.length)];
-                } while (randomIcon.name === target.name);
-                grid.push(randomIcon);
+                    otherCat = IMAGE_CATEGORIES[Math.floor(Math.random() * IMAGE_CATEGORIES.length)];
+                } while (otherCat.name === target.name);
+                
+                const keyword = otherCat.keywords[Math.floor(Math.random() * otherCat.keywords.length)];
+                grid.push({ 
+                    category: otherCat.name, 
+                    url: `https://images.unsplash.com/photo-${1517836357463 + i + Math.floor(Math.random() * 1000)}?auto=format&fit=crop&w=150&q=60&sig=${Math.random()}&${keyword}`
+                });
             }
         }
         
         if (targetCount === 0) {
-            grid[Math.floor(Math.random() * 9)] = target;
+            const keyword = target.keywords[0];
+            grid[Math.floor(Math.random() * 9)] = { 
+                category: target.name, 
+                url: `https://images.unsplash.com/photo-1517836357463?auto=format&fit=crop&w=150&q=60&sig=fallback&${keyword}`
+            };
         }
         
         setCaptchaGrid(grid);
         setSelectedIndices([]);
+        setCaptchaError('');
     };
 
-    React.useEffect(() => {
-        generateCaptcha();
-    }, []);
+    const handleVerifyCaptcha = () => {
+        const correctIndices = captchaGrid
+            .map((item, idx) => item.category === targetCategory ? idx : null)
+            .filter(idx => idx !== null);
+        
+        const isCorrect = correctIndices.length === selectedIndices.length && 
+                         selectedIndices.every(idx => correctIndices.includes(idx));
 
-    const toggleIcon = (index) => {
-        if (selectedIndices.includes(index)) {
-            setSelectedIndices(selectedIndices.filter(i => i !== index));
+        if (isCorrect) {
+            setIsVerified(true);
+            setShowCaptcha(false);
         } else {
-            setSelectedIndices([...selectedIndices, index]);
+            setCaptchaError('Selection incorrect. Please try again.');
+            generateCaptcha();
         }
     };
 
@@ -76,16 +95,8 @@ const Signup = () => {
         e.preventDefault();
         setError('');
 
-        const correctIndices = captchaGrid
-            .map((item, idx) => item.name === targetIconName ? idx : null)
-            .filter(idx => idx !== null);
-        
-        const isCorrect = correctIndices.length === selectedIndices.length && 
-                         selectedIndices.every(idx => correctIndices.includes(idx));
-
-        if (!isCorrect) {
-            setError(`Security Check Failed: Please select ALL ${targetIconName} icons.`);
-            generateCaptcha();
+        if (!isVerified) {
+            setError('Please verify that you are not a robot.');
             return;
         }
 
@@ -96,7 +107,7 @@ const Signup = () => {
             setSubmitted(true);
         } catch (err) {
             setError(err.response?.data?.message || 'Error occurred during signup');
-            generateCaptcha();
+            setIsVerified(false);
         } finally {
             setLoading(false);
         }
@@ -110,23 +121,9 @@ const Signup = () => {
                     <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '32px', letterSpacing: '2px', color: '#00ff89', margin: '0 0 15px' }}>
                         {emailSent ? 'CHECK YOUR EMAIL!' : 'ACCOUNT CREATED!'}
                     </h2>
-                    {emailSent ? (
-                        <>
-                            <p style={{ color: '#94a3b8', lineHeight: '1.8', marginBottom: '10px' }}>
-                                We've sent a <strong style={{ color: 'white' }}>verification link</strong> to:
-                            </p>
-                            <p style={{ color: '#00ff89', fontWeight: '800', fontSize: '16px', marginBottom: '25px' }}>{email}</p>
-                            <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '35px' }}>
-                                Click the link in that email to activate your account. Check your spam folder if you don't see it.
-                            </p>
-                        </>
-                    ) : (
-                        <>
-                            <p style={{ color: '#94a3b8', lineHeight: '1.8', marginBottom: '35px' }}>
-                                Your account is ready! You can now login with your credentials.
-                            </p>
-                        </>
-                    )}
+                    <p style={{ color: '#94a3b8', lineHeight: '1.8', marginBottom: '35px' }}>
+                        {emailSent ? `We've sent a verification link to ${email}.` : 'Your account is ready! You can now login.'}
+                    </p>
                     <Link to="/login" style={{ background: '#00ff89', color: 'black', padding: '14px 40px', borderRadius: '12px', textDecoration: 'none', fontWeight: '800', fontSize: '14px', letterSpacing: '1px' }}>
                         GO TO LOGIN
                     </Link>
@@ -176,27 +173,28 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: '25px', padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                            <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#00ff89', letterSpacing: '1px' }}>
-                                SELECT ALL <span style={{ color: 'white', background: 'rgba(0,255,137,0.2)', padding: '2px 8px', borderRadius: '4px' }}>{targetIconName.toUpperCase()}</span> ICONS
-                            </label>
-                            <RefreshCw size={14} color="#64748b" style={{ cursor: 'pointer' }} onClick={generateCaptcha} />
+                    {/* I am not a robot checkbox */}
+                    <div style={{ 
+                        marginBottom: '25px', padding: '15px 20px', background: '#080c10', 
+                        border: '1px solid #1f2937', borderRadius: '12px', display: 'flex', 
+                        alignItems: 'center', justifyContent: 'space-between', cursor: isVerified ? 'default' : 'pointer'
+                    }} onClick={() => { if(!isVerified) { generateCaptcha(); setShowCaptcha(true); } }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                            <div style={{ 
+                                width: '24px', height: '24px', border: '2px solid #1f2937', 
+                                borderRadius: '4px', background: isVerified ? '#00ff89' : 'transparent',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s'
+                            }}>
+                                {isVerified && <CheckCircle2 size={16} color="black" />}
+                            </div>
+                            <span style={{ fontSize: '14px', fontWeight: '600', color: isVerified ? 'white' : '#64748b' }}>
+                                I'm not a robot
+                            </span>
                         </div>
-                        
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-                            {captchaGrid.map((item, idx) => (
-                                <div key={idx} onClick={() => toggleIcon(idx)} style={{
-                                    height: '60px', background: selectedIndices.includes(idx) ? 'rgba(0,255,137,0.1)' : '#080c10',
-                                    border: selectedIndices.includes(idx) ? '2px solid #00ff89' : '1px solid #1f2937',
-                                    borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    cursor: 'pointer', transition: '0.2s', color: selectedIndices.includes(idx) ? '#00ff89' : '#475569'
-                                }}>
-                                    {item.icon}
-                                </div>
-                            ))}
+                        <div style={{ textAlign: 'right' }}>
+                            <ShieldCheck size={24} color={isVerified ? '#00ff89' : '#1f2937'} />
+                            <div style={{ fontSize: '8px', color: '#475569', marginTop: '2px' }}>FIT-CAPTCHA</div>
                         </div>
-                        <p style={{ fontSize: '10px', color: '#475569', marginTop: '12px', textAlign: 'center' }}>Verification required to prevent bots</p>
                     </div>
 
                     {error && (
@@ -207,7 +205,7 @@ const Signup = () => {
 
                     <button type="submit" disabled={loading} style={{
                         width: '100%', padding: '16px', background: '#00ff89', color: 'black',
-                        border: 'none', borderRadius: '12px', fontWeight: '800', fontSize: '14px', cursor: 'pointer', marginTop: '5px'
+                        border: 'none', borderRadius: '12px', fontWeight: '800', fontSize: '14px', cursor: 'pointer', opacity: isVerified ? 1 : 0.5
                     }}>
                         {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
                     </button>
@@ -217,6 +215,51 @@ const Signup = () => {
                     Already a member? <Link to="/login" style={{ color: '#00ff89', textDecoration: 'none', fontWeight: '800', marginLeft: '5px' }}>Login Here</Link>
                 </div>
             </div>
+
+            {/* Captcha Popup Modal */}
+            {showCaptcha && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+                    <div style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '24px', width: '100%', maxWidth: '380px', padding: '25px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                            <div>
+                                <h3 style={{ margin: 0, color: 'white', fontSize: '14px', fontWeight: '800', letterSpacing: '0.5px' }}>SELECT ALL IMAGES WITH</h3>
+                                <h2 style={{ margin: '5px 0 0', color: '#00ff89', fontFamily: 'Bebas Neue', fontSize: '32px', letterSpacing: '1px' }}>{targetCategory.toUpperCase()}</h2>
+                            </div>
+                            <button onClick={() => setShowCaptcha(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}><X size={20}/></button>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', background: '#30363d', padding: '4px', borderRadius: '8px' }}>
+                            {captchaGrid.map((item, idx) => (
+                                <div key={idx} onClick={() => {
+                                    if (selectedIndices.includes(idx)) setSelectedIndices(selectedIndices.filter(i => i !== idx));
+                                    else setSelectedIndices([...selectedIndices, idx]);
+                                }} style={{
+                                    height: '100px', background: '#0d1117', cursor: 'pointer', position: 'relative', overflow: 'hidden'
+                                }}>
+                                    <img src={item.url} alt="captcha" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: selectedIndices.includes(idx) ? 0.4 : 1, transition: '0.3s' }} />
+                                    {selectedIndices.includes(idx) && (
+                                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,255,137,0.2)', border: '4px solid #00ff89' }}>
+                                            <div style={{ background: '#00ff89', borderRadius: '50%', padding: '2px' }}><CheckCircle2 size={24} color="black" /></div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        {captchaError && <div style={{ color: '#ef4444', fontSize: '11px', marginTop: '10px', textAlign: 'center', fontWeight: '700' }}>{captchaError}</div>}
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', borderTop: '1px solid #30363d', paddingTop: '15px' }}>
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <RefreshCw size={20} color="#64748b" style={{ cursor: 'pointer' }} onClick={generateCaptcha} />
+                            </div>
+                            <button onClick={handleVerifyCaptcha} style={{ background: '#00ff89', color: 'black', border: 'none', padding: '10px 25px', borderRadius: '8px', fontWeight: '800', fontSize: '13px', cursor: 'pointer' }}>
+                                VERIFY
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
         </div>
     );
