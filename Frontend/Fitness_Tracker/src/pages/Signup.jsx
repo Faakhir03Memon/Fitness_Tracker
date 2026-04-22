@@ -25,10 +25,10 @@ const Signup = () => {
     const navigate = useNavigate();
 
     const IMAGE_CATEGORIES = [
-        { name: 'Dumbbells', keywords: ['dumbbell', 'weights', 'gym equipment'] },
-        { name: 'Healthy Food', keywords: ['salad', 'healthy food', 'fruit'] },
-        { name: 'Yoga', keywords: ['yoga', 'meditation', 'stretching'] },
-        { name: 'Running', keywords: ['running', 'jogging', 'marathon'] }
+        { name: 'Dumbbells', ids: ['1534438346981-9f1207c74a41', '1583454110551-21f2fa20e03e', '1517836357463-d25dfeac3438'] },
+        { name: 'Healthy Food', ids: ['1490817314783-e6051cca1d68', '1512621776951-a57141f2eefd', '1494390640147-397529a35811'] },
+        { name: 'Yoga', ids: ['1506126613408-eca07ce68773', '1544367567-0f2fcb009e0b', '1508672019048-805c876b61bd'] },
+        { name: 'Running', ids: ['1476480862198-195629485f90', '1502904550040-75345974294c', '1452626038306-9aae5e071dd3'] }
     ];
 
     const generateCaptcha = () => {
@@ -38,13 +38,14 @@ const Signup = () => {
         let grid = [];
         let targetCount = 0;
         
+        // Use a mix of all categories but prioritize target
         for (let i = 0; i < 9; i++) {
-            const isTarget = Math.random() > 0.6;
+            const isTarget = Math.random() > 0.6 || (targetCount < 2 && i > 6);
             if (isTarget) {
-                const keyword = target.keywords[Math.floor(Math.random() * target.keywords.length)];
+                const imgId = target.ids[Math.floor(Math.random() * target.ids.length)];
                 grid.push({ 
                     category: target.name, 
-                    url: `https://images.unsplash.com/photo-${1517836357463 + i + Math.floor(Math.random() * 1000)}?auto=format&fit=crop&w=150&q=60&sig=${Math.random()}&${keyword}`
+                    url: `https://images.unsplash.com/photo-${imgId}?auto=format&fit=crop&w=200&q=80&sig=${Math.random()}`
                 });
                 targetCount++;
             } else {
@@ -53,22 +54,13 @@ const Signup = () => {
                     otherCat = IMAGE_CATEGORIES[Math.floor(Math.random() * IMAGE_CATEGORIES.length)];
                 } while (otherCat.name === target.name);
                 
-                const keyword = otherCat.keywords[Math.floor(Math.random() * otherCat.keywords.length)];
+                const imgId = otherCat.ids[Math.floor(Math.random() * otherCat.ids.length)];
                 grid.push({ 
                     category: otherCat.name, 
-                    url: `https://images.unsplash.com/photo-${1517836357463 + i + Math.floor(Math.random() * 1000)}?auto=format&fit=crop&w=150&q=60&sig=${Math.random()}&${keyword}`
+                    url: `https://images.unsplash.com/photo-${imgId}?auto=format&fit=crop&w=200&q=80&sig=${Math.random()}`
                 });
             }
         }
-        
-        if (targetCount === 0) {
-            const keyword = target.keywords[0];
-            grid[Math.floor(Math.random() * 9)] = { 
-                category: target.name, 
-                url: `https://images.unsplash.com/photo-1517836357463?auto=format&fit=crop&w=150&q=60&sig=fallback&${keyword}`
-            };
-        }
-        
         setCaptchaGrid(grid);
         setSelectedIndices([]);
         setCaptchaError('');
