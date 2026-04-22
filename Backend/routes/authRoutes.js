@@ -128,14 +128,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Incorrect password. Please try again.' });
         }
 
-        // Check if email is verified
-        if (!user.isVerified) {
-            return res.status(403).json({ 
-                message: 'Please verify your email before logging in. Check your inbox.',
-                notVerified: true
-            });
-        }
-
+        // Check if account is banned
         if (user.isBanned) {
             return res.status(403).json({ message: 'Your account has been suspended by an admin.' });
         }

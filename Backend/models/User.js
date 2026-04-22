@@ -14,8 +14,8 @@ const userSchema = new mongoose.Schema({
     gender: { type: String },
     avatar: { type: String },
 
-    // Email Verification
-    isVerified: { type: Boolean, default: false },
+    // Email Verification (Auto-verified for convenience)
+    isVerified: { type: Boolean, default: true },
     verificationToken: { type: String },
 
     // Password Reset
