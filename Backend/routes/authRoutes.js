@@ -174,21 +174,21 @@ router.post('/forgot-password', async (req, res) => {
         const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
 
         if (emailConfigured) {
-            await sendPasswordResetEmail(email, user.name, resetToken);
-            res.json({ message: 'Password reset link has been sent to your email.' });
+            try {
+                await sendPasswordResetEmail(email, user.name, resetToken);
+                res.json({ message: 'Password reset link has been sent to your email.' });
+            } catch (emailError) {
+                console.error('Nodemailer Error:', emailError);
+                return res.status(500).json({ message: 'Failed to send email. Please check your SMTP settings.' });
+            }
         } else {
-            const devLink = `http://localhost:5173/reset-password/${resetToken}`;
-            console.log('--- DEVELOPMENT MODE: PASSWORD RESET LINK ---');
-            console.log(devLink);
-            console.log('--------------------------------------------');
-            res.json({ 
-                message: 'Email service is not configured in .env, but for testing purposes, the reset link has been generated.',
-                devLink: devLink // Returning it for easier testing by the user
-            });
+            // Minimal fallback for local dev if credentials are removed later
+            console.log('Reset Link (No Email Config):', `http://localhost:5173/reset-password/${resetToken}`);
+            res.status(500).json({ message: 'Email service not configured. Please contact administrator.' });
         }
     } catch (error) {
         console.error('Forgot password error:', error);
-        res.status(500).json({ message: 'Error processing request. Please check server logs.' });
+        res.status(500).json({ message: 'Error processing request.' });
     }
 });
 
