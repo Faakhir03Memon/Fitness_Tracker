@@ -61,4 +61,16 @@ router.get('/users/:id/logs', protect, adminOnly, async (req, res) => {
     }
 });
 
+// Get global system stats
+router.get('/stats', protect, adminOnly, async (req, res) => {
+    try {
+        const totalUsers = await User.countDocuments();
+        const totalWorkouts = await Workout.countDocuments();
+        const totalMeals = await Meal.countDocuments();
+        res.json({ totalUsers, totalWorkouts, totalMeals });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 module.exports = router;
