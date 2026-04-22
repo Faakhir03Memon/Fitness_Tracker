@@ -2,90 +2,90 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { UserPlus, Mail, Lock, User, Activity } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Dumbbell, Flame, Activity, Heart, Apple, Timer, Zap, Star, Coffee, Smartphone, RefreshCw } from 'lucide-react';
 import API_BASE_URL from '../api/config';
 
 const Signup = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [captcha, setCaptcha] = useState('');
-    const [captchaInput, setCaptchaInput] = useState('');
+    const [captchaGrid, setCaptchaGrid] = useState([]);
+    const [targetIconName, setTargetIconName] = useState('');
+    const [selectedIndices, setSelectedIndices] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
-    const canvasRef = React.useRef(null);
     const navigate = useNavigate();
 
+    const ICON_POOL = [
+        { name: 'Dumbbell', icon: <Dumbbell size={24} /> },
+        { name: 'Flame', icon: <Flame size={24} /> },
+        { name: 'Activity', icon: <Activity size={24} /> },
+        { name: 'Heart', icon: <Heart size={24} /> },
+        { name: 'Apple', icon: <Apple size={24} /> },
+        { name: 'Timer', icon: <Timer size={24} /> },
+        { name: 'Zap', icon: <Zap size={24} /> },
+        { name: 'Star', icon: <Star size={24} /> },
+        { name: 'Coffee', icon: <Coffee size={24} /> },
+        { name: 'Smartphone', icon: <Smartphone size={24} /> },
+    ];
+
     const generateCaptcha = () => {
-        const charSet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; 
-        let result = '';
-        for (let i = 0; i < 6; i++) {
-            result += charSet.charAt(Math.floor(Math.random() * charSet.length));
-        }
-        setCaptcha(result);
-        drawCaptcha(result);
-    };
-
-    const drawCaptcha = (text) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        const target = ICON_POOL[Math.floor(Math.random() * 3)]; // Target is one of the first 3 (Fitness related)
+        setTargetIconName(target.name);
         
-        // Background
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Noise lines
-        for (let i = 0; i < 5; i++) {
-            ctx.strokeStyle = `rgba(0, 255, 137, ${Math.random() * 0.3})`;
-            ctx.lineWidth = Math.random() * 2;
-            ctx.beginPath();
-            ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
-            ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
-            ctx.stroke();
-        }
-
-        // Noise dots
-        for (let i = 0; i < 30; i++) {
-            ctx.fillStyle = `rgba(0, 255, 137, ${Math.random() * 0.2})`;
-            ctx.beginPath();
-            ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // Captcha Text
-        ctx.font = 'bold 28px "Courier New"';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
+        let grid = [];
+        let targetCount = 0;
         
-        for (let i = 0; i < text.length; i++) {
-            const x = 30 + i * 25;
-            const y = canvas.height / 2 + (Math.random() * 10 - 5);
-            const angle = (Math.random() * 20 - 10) * Math.PI / 180;
-            
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(angle);
-            ctx.fillStyle = i % 2 === 0 ? '#00ff89' : '#00d4ff';
-            ctx.fillText(text[i], 0, 0);
-            ctx.restore();
+        for (let i = 0; i < 9; i++) {
+            const isTarget = Math.random() > 0.7;
+            if (isTarget) {
+                grid.push(target);
+                targetCount++;
+            } else {
+                let randomIcon;
+                do {
+                    randomIcon = ICON_POOL[Math.floor(Math.random() * ICON_POOL.length)];
+                } while (randomIcon.name === target.name);
+                grid.push(randomIcon);
+            }
         }
+        
+        if (targetCount === 0) {
+            grid[Math.floor(Math.random() * 9)] = target;
+        }
+        
+        setCaptchaGrid(grid);
+        setSelectedIndices([]);
     };
 
     React.useEffect(() => {
-        setTimeout(generateCaptcha, 100); // Small delay to ensure canvas is ready
+        generateCaptcha();
     }, []);
+
+    const toggleIcon = (index) => {
+        if (selectedIndices.includes(index)) {
+            setSelectedIndices(selectedIndices.filter(i => i !== index));
+        } else {
+            setSelectedIndices([...selectedIndices, index]);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
-        if (captchaInput.toUpperCase() !== captcha) {
-            setError('Invalid security code. Please try again.');
+        const correctIndices = captchaGrid
+            .map((item, idx) => item.name === targetIconName ? idx : null)
+            .filter(idx => idx !== null);
+        
+        const isCorrect = correctIndices.length === selectedIndices.length && 
+                         selectedIndices.every(idx => correctIndices.includes(idx));
+
+        if (!isCorrect) {
+            setError(`Security Check Failed: Please select ALL ${targetIconName} icons.`);
             generateCaptcha();
-            setCaptchaInput('');
             return;
         }
 
@@ -176,26 +176,27 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>IMAGE SECURITY CODE</label>
-                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <div style={{ 
-                                position: 'relative', overflow: 'hidden', borderRadius: '12px', 
-                                border: '1px solid #1e293b', background: '#0f172a', cursor: 'pointer' 
-                            }} onClick={generateCaptcha} title="Click to refresh">
-                                <canvas ref={canvasRef} width="180" height="48" style={{ display: 'block' }}></canvas>
-                                <div style={{ position: 'absolute', top: '5px', right: '5px', color: 'rgba(255,255,255,0.2)' }}>
-                                    <Activity size={12} />
-                                </div>
-                            </div>
-                            <input type="text" placeholder="Enter Code" value={captchaInput} onChange={(e) => setCaptchaInput(e.target.value)} required
-                                style={{ 
-                                    flex: 1, background: '#080c10', border: '1px solid #1f2937', 
-                                    borderRadius: '12px', padding: '14px', color: 'white', outline: 'none', 
-                                    textAlign: 'center', fontWeight: '800', letterSpacing: '2px', fontSize: '14px'
-                                }} />
+                    <div style={{ marginBottom: '25px', padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                            <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#00ff89', letterSpacing: '1px' }}>
+                                SELECT ALL <span style={{ color: 'white', background: 'rgba(0,255,137,0.2)', padding: '2px 8px', borderRadius: '4px' }}>{targetIconName.toUpperCase()}</span> ICONS
+                            </label>
+                            <RefreshCw size={14} color="#64748b" style={{ cursor: 'pointer' }} onClick={generateCaptcha} />
                         </div>
-                        <p style={{ fontSize: '10px', color: '#475569', marginTop: '8px', textAlign: 'center' }}>Can't read? Click the image to refresh</p>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                            {captchaGrid.map((item, idx) => (
+                                <div key={idx} onClick={() => toggleIcon(idx)} style={{
+                                    height: '60px', background: selectedIndices.includes(idx) ? 'rgba(0,255,137,0.1)' : '#080c10',
+                                    border: selectedIndices.includes(idx) ? '2px solid #00ff89' : '1px solid #1f2937',
+                                    borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    cursor: 'pointer', transition: '0.2s', color: selectedIndices.includes(idx) ? '#00ff89' : '#475569'
+                                }}>
+                                    {item.icon}
+                                </div>
+                            ))}
+                        </div>
+                        <p style={{ fontSize: '10px', color: '#475569', marginTop: '12px', textAlign: 'center' }}>Verification required to prevent bots</p>
                     </div>
 
                     {error && (
