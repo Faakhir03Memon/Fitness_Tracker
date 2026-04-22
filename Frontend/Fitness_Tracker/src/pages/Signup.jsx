@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { UserPlus, Mail, Lock, User } from 'lucide-react';
+import API_BASE_URL from '../api/config';
 
 const Signup = () => {
     const [name, setName] = useState('');
@@ -19,7 +20,7 @@ const Signup = () => {
         setError('');
         setLoading(true);
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/signup', { name, email, password });
+            const { data } = await axios.post(`${API_BASE_URL}/api/auth/signup`, { name, email, password });
             setEmailSent(data.emailSent);
             setSubmitted(true);
         } catch (err) {

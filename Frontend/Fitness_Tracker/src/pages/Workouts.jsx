@@ -2,20 +2,18 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Search, Filter, Play, Clock, Flame, Dumbbell, History } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api/config';
 
 const Workouts = () => {
   const { user } = useAuth();
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const authConfig = {
-    headers: { Authorization: `Bearer ${user.token}` }
-  };
-
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/workouts', authConfig);
+        const authConfig = { headers: { Authorization: `Bearer ${user.token}` } };
+        const res = await axios.get(`${API_BASE_URL}/api/workouts`, authConfig);
         setWorkouts(res.data);
         setLoading(false);
       } catch (err) {

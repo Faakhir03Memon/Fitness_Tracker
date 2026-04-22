@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, Flame, Clock, Footprints, Droplets, Target, Activity, GlassWater, Footprints as StepsIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api/config';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -33,9 +34,9 @@ const Dashboard = () => {
     try {
       const date = new Date().toISOString().split('T')[0];
       const [statsRes, workoutsRes, weeklyRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/stats/${date}`, authConfig),
-        axios.get('http://localhost:5000/api/workouts', authConfig),
-        axios.get('http://localhost:5000/api/stats/range/weekly', authConfig)
+        axios.get(`${API_BASE_URL}/api/stats/${date}`, authConfig),
+        axios.get(`${API_BASE_URL}/api/workouts`, authConfig),
+        axios.get(`${API_BASE_URL}/api/stats/range/weekly`, authConfig)
       ]);
 
       setStats({
@@ -66,7 +67,7 @@ const Dashboard = () => {
 
   const handleSaveWorkout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/workouts', newWorkout, authConfig);
+      await axios.post(`${API_BASE_URL}/api/workouts`, newWorkout, authConfig);
       setIsModalOpen(false);
       setNewWorkout({ type: '', duration: '', calories: '', notes: '' });
       fetchInitialData();
@@ -79,7 +80,7 @@ const Dashboard = () => {
       try {
           const date = new Date().toISOString().split('T')[0];
           const waterLiters = dailyStats.waterGlasses * 0.25;
-          await axios.post('http://localhost:5000/api/stats/update', {
+          await axios.post(`${API_BASE_URL}/api/stats/update`, {
               date,
               steps: Number(dailyStats.steps),
               water: waterLiters
@@ -95,7 +96,7 @@ const Dashboard = () => {
       try {
           const date = new Date().toISOString().split('T')[0];
           const newWater = stats.water + 0.25;
-          await axios.post('http://localhost:5000/api/stats/update', {
+          await axios.post(`${API_BASE_URL}/api/stats/update`, {
               date,
               water: newWater
           }, authConfig);

@@ -2,35 +2,32 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { TrendingUp, Award, Calendar, ChevronRight, Activity, Target, BarChart3 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api/config';
 
 const Progress = () => {
   const { user } = useAuth();
   const [weeklyData, setWeeklyData] = useState([]);
-  const [goals, setGoals] = useState([
+  const [goals] = useState([
     { name: 'Weight Loss', pct: 72, color: 'var(--accent-green)', icon: <TrendingUp size={16}/> },
     { name: 'Muscle Gain', pct: 58, color: 'var(--accent-cyan)', icon: <Activity size={16}/> },
     { name: 'Endurance', pct: 85, color: 'var(--accent-purple)', icon: <Award size={16}/> },
     { name: 'Flexibility', pct: 40, color: 'var(--accent-orange)', icon: <Calendar size={16}/> }
   ]);
 
-  const authConfig = {
-    headers: { Authorization: `Bearer ${user.token}` }
-  };
-
   useEffect(() => {
     const fetchProgress = async () => {
         if (!user || !user.token) return;
         try {
-            const res = await axios.get('http://localhost:5000/api/stats/range/weekly', authConfig);
+            const authConfig = { headers: { Authorization: `Bearer ${user.token}` } };
+            const res = await axios.get(`${API_BASE_URL}/api/stats/range/weekly`, authConfig);
             
             const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            const todayIdx = new Date().getDay(); // 0 is Sun, 1 is Mon...
+            const todayIdx = new Date().getDay(); 
             
-            // Generate full 7 day data even if backend is empty
             const data = days.map((dayName, idx) => {
                 const found = res.data.find(item => {
                     const d = new Date(item.date).getDay();
-                    const adjustedD = d === 0 ? 6 : d - 1; // Map Sun(0)->6, Mon(1)->0
+                    const adjustedD = d === 0 ? 6 : d - 1; 
                     return adjustedD === idx;
                 });
                 

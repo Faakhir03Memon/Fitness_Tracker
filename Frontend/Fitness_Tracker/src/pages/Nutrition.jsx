@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Salad, Zap, Heart, Plus, Search, Utensils, Brain, Flame, Info } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api/config';
 
 // Pakistani Food Database with Nutritional Values
 const ASIAN_FOOD_DATABASE = [
@@ -45,8 +46,8 @@ const Nutrition = () => {
         if (!user) return;
         try {
             const [mealsRes, statsRes] = await Promise.all([
-                axios.get(`http://localhost:5000/api/meals/${today}`, authConfig),
-                axios.get(`http://localhost:5000/api/stats/${today}`, authConfig)
+                axios.get(`${API_BASE_URL}/api/meals/${today}`, authConfig),
+                axios.get(`${API_BASE_URL}/api/stats/${today}`, authConfig)
             ]);
             setMeals(mealsRes.data);
             setStats({
@@ -63,7 +64,7 @@ const Nutrition = () => {
 
     const handleLogMeal = async (food) => {
         try {
-            await axios.post('http://localhost:5000/api/meals', {
+            await axios.post(`${API_BASE_URL}/api/meals`, {
                 ...food,
                 foodName: food.name,
                 calories: food.cal,

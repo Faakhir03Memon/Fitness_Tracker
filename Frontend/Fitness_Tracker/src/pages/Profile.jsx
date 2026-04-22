@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Camera, Settings, Shield, Bell, Trophy, LogOut, Save, X, User as UserIcon, Mail, Ruler, Weight, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import API_BASE_URL from '../api/config';
 
 const Profile = () => {
   const { user, login, logout } = useAuth();
@@ -22,7 +23,7 @@ const Profile = () => {
       const config = {
         headers: { Authorization: `Bearer ${user.token}` }
       };
-      const { data } = await axios.put('http://localhost:5000/api/auth/profile', formData, config);
+      const { data } = await axios.put(`${API_BASE_URL}/api/auth/profile`, formData, config);
       login(data);
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
       setIsEditing(false);
