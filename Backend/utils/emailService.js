@@ -20,7 +20,7 @@ const sendVerificationEmail = async (toEmail, name, token) => {
     const verifyLink = `http://localhost:5173/verify-email/${token}`;
 
     await transporter.sendMail({
-        from: `"FitTrack" <${process.env.EMAIL_USER}>`,
+        from: `"FitTrack Official Support" <${process.env.EMAIL_USER}>`,
         to: toEmail,
         subject: '✅ Verify Your FitTrack Account',
         html: `
@@ -52,7 +52,7 @@ const sendPasswordResetEmail = async (toEmail, name, token) => {
     const resetLink = `http://localhost:5173/reset-password/${token}`;
 
     await transporter.sendMail({
-        from: `"FitTrack" <${process.env.EMAIL_USER}>`,
+        from: `"FitTrack Official Support" <${process.env.EMAIL_USER}>`,
         to: toEmail,
         subject: '🔐 Reset Your FitTrack Password',
         html: `
