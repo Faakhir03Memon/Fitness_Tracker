@@ -20,7 +20,7 @@ const AdminDashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/admin/users', authConfig);
+            const res = await axios.get(`${API_BASE_URL}/api/admin/users`, authConfig);
             setUsers(res.data);
             setLoading(false);
         } catch (err) {
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
 
     const handleToggleBan = async (userId, currentlyBanned) => {
         try {
-            await axios.put(`http://localhost:5000/api/admin/users/${userId}/status`, {
+            await axios.put(`${API_BASE_URL}/api/admin/users/${userId}/status`, {
                 isBanned: !currentlyBanned,
                 status: !currentlyBanned ? 'banned' : 'active'
             }, authConfig);
@@ -44,7 +44,7 @@ const AdminDashboard = () => {
     const handleDeleteUser = async (userId) => {
         if (!window.confirm("Are you sure you want to permanently delete this user and all their data?")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/admin/users/${userId}`, authConfig);
+            await axios.delete(`${API_BASE_URL}/api/admin/users/${userId}`, authConfig);
             fetchUsers();
         } catch (err) {
             console.error(err);
@@ -53,7 +53,7 @@ const AdminDashboard = () => {
 
     const viewLogs = async (userId) => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/admin/users/${userId}/logs`, authConfig);
+            const res = await axios.get(`${API_BASE_URL}/api/admin/users/${userId}/logs`, authConfig);
             setSelectedUserLogs(res.data);
         } catch (err) {
             console.error(err);
