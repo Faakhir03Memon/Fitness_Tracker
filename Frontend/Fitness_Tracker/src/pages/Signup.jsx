@@ -185,21 +185,21 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                         <div>
                             <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>WEIGHT (KG)</label>
-                            <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 15px' }}>
-                                <Weight size={18} color="#475569" style={{ marginRight: '10px' }} />
+                            <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
+                                <Weight size={18} color="#475569" style={{ marginRight: '15px' }} />
                                 <input type="number" placeholder="0.0" value={weight} onChange={(e) => setWeight(e.target.value)}
-                                    style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none', minWidth: '0' }} />
+                                    style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
                             </div>
                         </div>
                         <div>
                             <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>HEIGHT (CM)</label>
-                            <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 15px' }}>
-                                <Ruler size={18} color="#475569" style={{ marginRight: '10px' }} />
+                            <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
+                                <Ruler size={18} color="#475569" style={{ marginRight: '15px' }} />
                                 <input type="number" placeholder="0" value={height} onChange={(e) => setHeight(e.target.value)}
-                                    style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none', minWidth: '0' }} />
+                                    style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
                             </div>
                         </div>
                     </div>
