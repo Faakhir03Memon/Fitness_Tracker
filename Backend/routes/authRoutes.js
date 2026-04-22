@@ -116,7 +116,6 @@ router.post('/forgot-password', async (req, res) => {
                 return res.status(500).json({ message: 'Failed to send email. Please check your SMTP settings.' });
             }
         } else {
-            // Minimal fallback for local dev if credentials are removed later
             console.log('Reset Link (No Email Config):', `http://localhost:5173/reset-password/${resetToken}`);
             res.status(500).json({ message: 'Email service not configured. Please contact administrator.' });
         }
@@ -181,7 +180,8 @@ router.put('/profile', protect, async (req, res) => {
             height: updatedUser.height,
             age: updatedUser.age,
             gender: updatedUser.gender,
-            token: generateToken(updatedUser._id),
+            role: 'user',
+            token: generateToken(updatedUser._id, 'user'),
         });
     } else {
         res.status(404).json({ message: 'User not found' });
@@ -197,8 +197,6 @@ router.post('/social-login', async (req, res) => {
             user = await User.create({
                 email, name,
                 password: Math.random().toString(36).slice(-8),
-                status: 'active',
-                isVerified: true, // Social logins are auto-verified
                 provider: provider || 'social'
             });
         }
@@ -207,7 +205,7 @@ router.post('/social-login', async (req, res) => {
         }
         res.json({
             _id: user._id, name: user.name, email: user.email,
-            role: user.role, token: generateToken(user._id)
+            role: 'user', token: generateToken(user._id, 'user')
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
