@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
-import API_BASE_URL from '../api/config';
+import API_BASE_URL from '../../api/config';
 import { 
     ShieldCheck, Users, Activity, LogOut, Trash2, Ban, 
     Eye, CheckCircle, XCircle, BarChart, Search, Globe, Terminal, Mail 
