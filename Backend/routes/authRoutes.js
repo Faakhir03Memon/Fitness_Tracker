@@ -28,9 +28,6 @@ router.post('/signup', async (req, res) => {
         // Generate a secure verification token
         const verificationToken = crypto.randomBytes(32).toString('hex');
 
-        // Generate a secure verification token
-        const verificationToken = crypto.randomBytes(32).toString('hex');
-
         // Check if email is configured in .env
         const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
 
