@@ -15,7 +15,7 @@ const generateToken = (id, role = 'user') => {
 };
 
 // @route   POST /api/auth/signup
-// @desc    Register a new user & attempt to send verification email
+// @desc    Register a new user
 router.post('/signup', async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -25,98 +25,41 @@ router.post('/signup', async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Generate a secure verification token
-        const verificationToken = crypto.randomBytes(32).toString('hex');
-
-        // Check if email is configured in .env
-        const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
-
-        const user = await User.create({
+        await User.create({
             name,
             email,
-            password,
-            isVerified: false,
-            verificationToken: verificationToken
+            password
         });
 
-        if (emailConfigured) {
-            try {
-                await sendVerificationEmail(email, name, verificationToken);
-                return res.status(201).json({
-                    message: 'Account created! Please check your email to verify your account before logging in.',
-                    emailSent: true
-                });
-            } catch (emailErr) {
-                // If email fails, we still allow them to login for now as a fallback
-                user.isVerified = true;
-                user.verificationToken = undefined;
-                await user.save();
-                return res.status(201).json({
-                    message: 'Account created! Email service is having issues, so your account has been auto-verified for now.',
-                    emailSent: false
-                });
-            }
-        }
-
-        // No email config - direct login ready
-        res.status(201).json({
-            message: 'Account created successfully! You can now login.',
-            emailSent: false
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-// @route   GET /api/auth/verify-email/:token
-// @desc    Verify user's email
-router.get('/verify-email/:token', async (req, res) => {
-    try {
-        const user = await User.findOne({ verificationToken: req.params.token });
-
-        if (!user) {
-            return res.status(400).json({ message: 'Invalid or expired verification link.' });
-        }
-
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        await user.save();
-
-        res.json({ message: 'Email verified successfully! You can now login.' });
+        res.status(201).json({ message: 'Account created successfully! You can login now.' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
 // @route   POST /api/auth/login
-// @desc    Login user or admin (user must be verified)
+// @desc    Authenticate user & get token
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
-    }
-
     try {
-        // First check in Admin table
+        // 1. Check for Admin first
         const admin = await Admin.findOne({ email });
         if (admin) {
             const isMatch = await admin.comparePassword(password);
-            if (isMatch) {
-                return res.json({
-                    _id: admin._id,
-                    email: admin.email,
-                    role: 'admin',
-                    token: generateToken(admin._id, 'admin'),
-                });
-            } else {
+            if (!isMatch) {
                 return res.status(401).json({ message: 'Incorrect admin password.' });
             }
+            return res.json({
+                _id: admin._id,
+                email: admin.email,
+                role: 'admin',
+                token: generateToken(admin._id, 'admin'),
+            });
         }
 
-        // Then check in User table
+        // 2. Check for Regular User
         const user = await User.findOne({ email });
-
         if (!user) {
             return res.status(401).json({ message: 'No account found with this email. Please sign up first.' });
         }
@@ -124,14 +67,6 @@ router.post('/login', async (req, res) => {
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Incorrect password. Please try again.' });
-        }
-
-        // Check if email is verified
-        if (!user.isVerified) {
-            return res.status(403).json({ 
-                message: 'Please verify your email before logging in. Check your inbox for the activation link.',
-                notVerified: true
-            });
         }
 
         // Check if account is banned
@@ -144,11 +79,11 @@ router.post('/login', async (req, res) => {
             name: user.name,
             email: user.email,
             role: 'user',
-            token: generateToken(user._id),
+            token: generateToken(user._id, 'user'),
         });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ message: 'Server error during login. Please try again later.' });
+        res.status(500).json({ message: 'Server error during login.' });
     }
 });
 

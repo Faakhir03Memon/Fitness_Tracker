@@ -13,11 +13,6 @@ const userSchema = new mongoose.Schema({
     age: { type: Number },
     gender: { type: String },
     avatar: { type: String },
-
-    // Email Verification
-    isVerified: { type: Boolean, default: false },
-    verificationToken: { type: String },
-
     // Password Reset
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
