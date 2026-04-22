@@ -31,25 +31,34 @@ router.post('/signup', async (req, res) => {
         // Check if email is configured in .env
         const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
 
+        // Generate a secure verification token
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+
+        // Check if email is configured in .env
+        const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
+
         const user = await User.create({
             name,
             email,
             password,
-            isVerified: true, // Auto-verify enabled
-            verificationToken: undefined
+            isVerified: false,
+            verificationToken: verificationToken
         });
 
         if (emailConfigured) {
-            // Try to send a welcome email (optional)
             try {
-                await sendVerificationEmail(email, name, 'welcome'); // Just a welcome placeholder
+                await sendVerificationEmail(email, name, verificationToken);
                 return res.status(201).json({
-                    message: 'Account created successfully! You can login now.',
+                    message: 'Account created! Please check your email to verify your account before logging in.',
                     emailSent: true
                 });
             } catch (emailErr) {
+                // If email fails, we still allow them to login for now as a fallback
+                user.isVerified = true;
+                user.verificationToken = undefined;
+                await user.save();
                 return res.status(201).json({
-                    message: 'Account created successfully! You can login now.',
+                    message: 'Account created! Email service is having issues, so your account has been auto-verified for now.',
                     emailSent: false
                 });
             }
