@@ -12,19 +12,23 @@ const AdminDashboard = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [view, setView] = useState('dashboard'); // 'dashboard' or 'users'
-    const [usersList, setUsersList] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedUserLogs, setSelectedUserLogs] = useState(null);
-
-    const authConfig = {
-        headers: { Authorization: `Bearer ${user.token}` }
-    };
-
+    const [globalStats, setGlobalStats] = useState({ totalUsers: 0, totalWorkouts: 0, totalMeals: 0 });
+// ...
     useEffect(() => {
+        fetchGlobalStats();
         if (view === 'users') {
             fetchUsers();
         }
     }, [view]);
+
+    const fetchGlobalStats = async () => {
+        try {
+            const res = await axios.get(`${API_BASE_URL}/api/admin/stats`, authConfig);
+            setGlobalStats(res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -111,11 +115,15 @@ const AdminDashboard = () => {
                         <div className="admin-stats-grid">
                             <div className="stat-box">
                                 <h3>Total Workouts Across App</h3>
-                                <p className="stat-value">1,248</p>
+                                <p className="stat-value">{globalStats.totalWorkouts.toLocaleString()}</p>
                             </div>
                             <div className="stat-box">
-                                <h3>Daily Active Users</h3>
-                                <p className="stat-value">84</p>
+                                <h3>Total Registered Users</h3>
+                                <p className="stat-value">{globalStats.totalUsers.toLocaleString()}</p>
+                            </div>
+                            <div className="stat-box">
+                                <h3>Total Meals Logged</h3>
+                                <p className="stat-value">{globalStats.totalMeals.toLocaleString()}</p>
                             </div>
                         </div>
 
