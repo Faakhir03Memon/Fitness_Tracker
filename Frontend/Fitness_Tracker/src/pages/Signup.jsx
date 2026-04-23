@@ -17,6 +17,7 @@ const Signup = () => {
     const [weight, setWeight] = useState('');
     const [height, setHeight] = useState('');
     const [age, setAge] = useState('');
+    const [gender, setGender] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -113,7 +114,7 @@ const Signup = () => {
         setLoading(true);
         try {
             const { data } = await axios.post(`${API_BASE_URL}/api/auth/signup`, { 
-                name, email, password, weight, height, age 
+                name, email, password, weight, height, age, gender 
             });
             setEmailSent(data.emailSent);
             setSubmitted(true);
@@ -210,6 +211,20 @@ const Signup = () => {
                             <Calendar size={18} color="#475569" style={{ marginRight: '15px' }} />
                             <input type="number" placeholder="Enter your age" value={age} onChange={(e) => setAge(e.target.value)}
                                 style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none' }} />
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', marginBottom: '10px' }}>GENDER</label>
+                        <div style={{ display: 'flex', alignItems: 'center', background: '#080c10', border: '1px solid #1f2937', borderRadius: '12px', padding: '0 20px' }}>
+                            <User size={18} color="#475569" style={{ marginRight: '15px' }} />
+                            <select value={gender} onChange={(e) => setGender(e.target.value)} required
+                                style={{ background: 'none', border: 'none', padding: '14px 0', color: 'white', flex: 1, outline: 'none', appearance: 'none' }}>
+                                <option value="" style={{background: '#0d1117'}}>Select Gender</option>
+                                <option value="male" style={{background: '#0d1117'}}>Male</option>
+                                <option value="female" style={{background: '#0d1117'}}>Female</option>
+                                <option value="other" style={{background: '#0d1117'}}>Other</option>
+                            </select>
                         </div>
                     </div>
 

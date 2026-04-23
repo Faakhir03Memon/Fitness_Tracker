@@ -17,7 +17,7 @@ const generateToken = (id, role = 'user') => {
 // @route   POST /api/auth/signup
 // @desc    Register a new user
 router.post('/signup', async (req, res) => {
-    const { name, email, password, weight, height, age } = req.body;
+    const { name, email, password, weight, height, age, gender } = req.body;
 
     try {
         const userExists = await User.findOne({ email });
@@ -31,7 +31,8 @@ router.post('/signup', async (req, res) => {
             password,
             weight,
             height,
-            age
+            age,
+            gender
         });
 
         res.status(201).json({ message: 'Account created successfully! You can login now.' });

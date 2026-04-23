@@ -13,6 +13,7 @@ const Profile = () => {
     weight: user?.weight || '',
     height: user?.height || '',
     age: user?.age || '',
+    gender: user?.gender || '',
     password: ''
   });
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -85,6 +86,7 @@ const Profile = () => {
              <MetricBox icon={<Weight size={20} />} label="Weight" value={user?.weight || '--'} unit="kg" />
              <MetricBox icon={<Ruler size={20} />} label="Height" value={user?.height || '--'} unit="cm" />
              <MetricBox icon={<Calendar size={20} />} label="Age" value={user?.age || '--'} unit="yrs" />
+             <MetricBox icon={<UserIcon size={20} />} label="Gender" value={user?.gender || '--'} unit="" />
           </div>
         </div>
       </div>
@@ -138,6 +140,19 @@ const Profile = () => {
                             onChange={(e) => setFormData({...formData, age: e.target.value})}
                             placeholder="0"
                         />
+                    </div>
+                    <div className="form-group">
+                        <label><UserIcon size={14}/> Gender</label>
+                        <select 
+                            value={formData.gender} 
+                            onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                            style={{ width: '100%', background: '#080c10', border: '1px solid var(--border)', padding: '14px 16px', borderRadius: '12px', color: 'white', outline: 'none' }}
+                        >
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
                     </div>
                     <div className="form-group">
                         <label><Shield size={14}/> Security (Change Password)</label>
