@@ -113,7 +113,7 @@ const AdminDashboard = () => {
 
             <main className="admin-main">
                 <header className="admin-header">
-                    <h1 style={{fontFamily: 'Bebas Neue', fontSize: '32px', letterSpacing: '2px'}}>Welcome, Mymn SaaB</h1>
+                    <h1 style={{fontFamily: 'Bebas Neue', fontSize: '32px', letterSpacing: '2px'}}>Welcome, {user.name || 'System Master'}</h1>
                     <p style={{color: '#94a3b8', fontSize: '13px'}}>System Status: <span style={{color: '#00ff89'}}>Online & Secure</span></p>
                 </header>
 
