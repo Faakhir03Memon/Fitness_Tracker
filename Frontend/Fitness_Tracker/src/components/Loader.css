@@ -3,141 +3,145 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 32px;
-  perspective: 1000px;
+  gap: 40px;
+  position: relative;
+  padding: 60px;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
 }
 
 .running-person {
-  width: 140px;
-  height: 140px;
+  width: 160px;
+  height: 160px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* SPEED LINES */
-.running-person::after {
-  content: '';
+/* ENERGY RIPPLES */
+.energy-ring {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: 
-    linear-gradient(90deg, transparent 0%, var(--accent-green) 50%, transparent 100%) 0% 20% / 40px 2px no-repeat,
-    linear-gradient(90deg, transparent 0%, var(--accent-cyan) 50%, transparent 100%) 10% 50% / 60px 2px no-repeat,
-    linear-gradient(90deg, transparent 0%, var(--accent-green) 50%, transparent 100%) 5% 80% / 30px 2px no-repeat;
-  opacity: 0.3;
-  transform: translate(-50%, -50%);
-  animation: speed-lines 0.4s linear infinite;
+  border: 1px solid var(--accent-green);
+  border-radius: 50%;
+  opacity: 0;
+  animation: ripple 2s infinite cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-@keyframes speed-lines {
-  from { transform: translate(-30%, -50%); opacity: 0; }
-  50% { opacity: 0.3; }
-  to { transform: translate(-70%, -50%); opacity: 0; }
+.energy-ring:nth-child(1) { animation-delay: 0s; }
+.energy-ring:nth-child(2) { animation-delay: 0.6s; }
+.energy-ring:nth-child(3) { animation-delay: 1.2s; }
+
+@keyframes ripple {
+  0% { width: 40px; height: 40px; opacity: 0.5; }
+  100% { width: 200px; height: 200px; opacity: 0; }
 }
 
 .runner-svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 15px rgba(0, 255, 135, 0.5));
+  z-index: 2;
+  filter: drop-shadow(0 0 20px rgba(0, 255, 135, 0.6));
 }
 
-/* GRADIENT RUNNER */
-.runner-svg path, .runner-svg circle {
-  fill: url(#runner-gradient);
+/* HIGH-END GRADIENT */
+#runner-gradient stop:first-child { stop-color: #00ff87; }
+#runner-gradient stop:last-child { stop-color: #00d4ff; }
+
+/* MOTION BLUR EFFECT */
+.runner-shadow {
+  position: absolute;
+  width: 60px;
+  height: 10px;
+  background: radial-gradient(ellipse at center, rgba(0, 255, 135, 0.2) 0%, transparent 70%);
+  bottom: 20px;
+  animation: shadow-pulse 0.3s infinite alternate ease-in-out;
 }
 
-/* BODY ANIMATIONS */
+@keyframes shadow-pulse {
+  from { transform: scale(0.8); opacity: 0.2; }
+  to { transform: scale(1.2); opacity: 0.4; }
+}
+
+/* ADVANCED BIOMECHANICS */
 .runner-torso {
-  animation: runner-torso 0.4s ease-in-out infinite alternate;
-  transform-origin: center;
+  animation: body-drive 0.4s infinite ease-in-out alternate;
 }
 
 .runner-leg-back {
-  animation: runner-leg-back 0.6s infinite linear;
-  transform-origin: 32px 35px;
+  animation: leg-drive-back 0.5s infinite linear;
 }
 
 .runner-leg-front {
-  animation: runner-leg-front 0.6s infinite linear;
-  transform-origin: 32px 35px;
+  animation: leg-drive-front 0.5s infinite linear;
 }
 
-.runner-arm-back {
-  animation: runner-arm-back 0.6s infinite ease-in-out;
-  transform-origin: 32px 22px;
+@keyframes body-drive {
+  from { transform: translateY(0) rotate(-2deg); }
+  to { transform: translateY(-6px) rotate(2deg); }
 }
 
-.runner-arm-front {
-  animation: runner-arm-front 0.6s infinite ease-in-out;
-  transform-origin: 32px 22px;
+@keyframes leg-drive-back {
+  0% { transform: rotate(-60deg) translateX(0); }
+  50% { transform: rotate(60deg) translateX(5px); }
+  100% { transform: rotate(-60deg) translateX(0); }
 }
 
-@keyframes runner-torso {
-  from { transform: translateY(0) rotate(0deg); }
-  to { transform: translateY(-3px) rotate(2deg); }
+@keyframes leg-drive-front {
+  0% { transform: rotate(60deg) translateX(5px); }
+  50% { transform: rotate(-60deg) translateX(0); }
+  100% { transform: rotate(60deg) translateX(5px); }
 }
 
-@keyframes runner-leg-back {
-  0%, 100% { transform: rotate(-45deg); }
-  50% { transform: rotate(45deg); }
+/* TYPOGRAPHY */
+.loader-info {
+  text-align: center;
 }
 
-@keyframes runner-leg-front {
-  0%, 100% { transform: rotate(45deg); }
-  50% { transform: rotate(-45deg); }
-}
-
-@keyframes runner-arm-back {
-  0%, 100% { transform: rotate(30deg); }
-  50% { transform: rotate(-50deg); }
-}
-
-@keyframes runner-arm-front {
-  0%, 100% { transform: rotate(-50deg); }
-  50% { transform: rotate(30deg); }
-}
-
-/* TEXT STYLING */
 .loader-text {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
-  letter-spacing: 6px;
-  color: var(--text-primary);
+  font-size: 28px;
+  letter-spacing: 10px;
+  color: white;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.loader-status {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
   text-transform: uppercase;
-  background: linear-gradient(90deg, #fff, var(--accent-green), #fff);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shine 2s linear infinite;
+  letter-spacing: 4px;
+  color: var(--accent-green);
+  opacity: 0.8;
 }
 
-@keyframes shine {
-  to { background-position: 200% center; }
-}
-
-.loading-bar-container {
-  width: 240px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-}
-
-.loading-bar-progress {
+/* CIRCULAR PROGRESS RING */
+.progress-ring {
   position: absolute;
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
-  left: -100%;
-  animation: loading-slide 1.5s infinite cubic-bezier(0.65, 0, 0.35, 1);
+  width: 180px;
+  height: 180px;
+  transform: rotate(-90deg);
 }
 
-@keyframes loading-slide {
-  from { left: -100%; }
-  to { left: 100%; }
+.progress-ring circle {
+  fill: transparent;
+  stroke: rgba(255, 255, 255, 0.05);
+  stroke-width: 2;
+}
+
+.progress-ring .progress-bar {
+  stroke: var(--accent-green);
+  stroke-dasharray: 565;
+  stroke-dashoffset: 400;
+  stroke-linecap: round;
+  animation: progress-spin 2s infinite ease-in-out;
+}
+
+@keyframes progress-spin {
+  0% { stroke-dashoffset: 565; transform: rotate(0deg); }
+  50% { stroke-dashoffset: 200; transform: rotate(180deg); }
+  100% { stroke-dashoffset: 565; transform: rotate(360deg); }
 }
