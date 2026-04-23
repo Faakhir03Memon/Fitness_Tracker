@@ -72,22 +72,22 @@
 }
 
 .runner-leg-back {
-  animation: leg-drive-back 0.6s infinite linear;
+  animation: leg-drive-back 0.4s infinite linear;
   transform-origin: 32px 35px;
 }
 
 .runner-leg-front {
-  animation: leg-drive-front 0.6s infinite linear;
+  animation: leg-drive-front 0.4s infinite linear;
   transform-origin: 32px 35px;
 }
 
 .runner-arm-back {
-  animation: arm-drive-back 0.6s infinite ease-in-out;
+  animation: arm-drive-back 0.4s infinite ease-in-out;
   transform-origin: 32px 20px;
 }
 
 .runner-arm-front {
-  animation: arm-drive-front 0.6s infinite ease-in-out;
+  animation: arm-drive-front 0.4s infinite ease-in-out;
   transform-origin: 32px 20px;
 }
 

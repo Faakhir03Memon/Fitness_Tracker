@@ -6,14 +6,14 @@ const SplashScreen = ({ onComplete }) => {
   const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
-    // Show splash for 3 seconds, then start fade out
+    // Show splash for 2 seconds, then start fade out
     const timer = setTimeout(() => {
       setIsFading(true);
       // Wait for fade animation to complete
       setTimeout(() => {
         if (onComplete) onComplete();
       }, 800);
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [onComplete]);
