@@ -11,7 +11,7 @@ const Sidebar = () => {
             <div className="logo">FITTRACK</div>
             
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Dashboard">
+                <NavLink to="/dashboard" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Dashboard">
                     <LayoutDashboard className="nav-icon" />
                 </NavLink>
                 <NavLink to="/workouts" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Workouts">
