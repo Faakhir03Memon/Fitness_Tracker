@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack | Graphical Memory & Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05080f;
+            --node-frontend: #00ff89;
+            --node-backend: #00d4ff;
+            --node-data: #ff007a;
+            --line-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            cursor: grab;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        .ui-overlay {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 48px;
+            letter-spacing: 4px;
+            margin: 0;
+            color: var(--node-frontend);
+            text-shadow: 0 0 20px rgba(0, 255, 137, 0.4);
+        }
+
+        .status-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 15px;
+            background: rgba(0, 255, 137, 0.1);
+            border: 1px solid var(--node-frontend);
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .legend {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: rgba(13, 17, 23, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .controls-hint {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ui-overlay">
+        <h1>FITTRACK BRAIN MAP</h1>
+        <div class="status-badge">System Integrity: 100% Verified</div>
+        <p style="color: #64748b; font-size: 13px; margin-top: 20px; max-width: 300px; line-height: 1.6;">
+            Interactive graphical architecture showing how files are interconnected across the entire stack.
+        </p>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="dot" style="background: var(--node-frontend)"></div> Frontend (UI/Logic)</div>
+        <div class="legend-item"><div class="dot" style="background: var(--node-backend)"></div> Backend (Routes/Controllers)</div>
+        <div class="legend-item"><div class="dot" style="background: var(--node-data)"></div> Database (Models/Stats)</div>
+    </div>
+
+    <div class="controls-hint">DRAG TO EXPLORE • HOVER TO INSPECT</div>
+
+    <div id="canvas-container">
+        <canvas id="graphCanvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        const nodes = [
+            // FRONTEND CLUSTER
+            { id: 'App.jsx', group: 'frontend', x: 0, y: 0, size: 12 },
+            { id: 'AuthContext.jsx', group: 'frontend', x: -100, y: -100, size: 8 },
+            { id: 'Login.jsx', group: 'frontend', x: -150, y: -50, size: 6 },
+            { id: 'Signup.jsx', group: 'frontend', x: -150, y: 50, size: 6 },
+            { id: 'Dashboard.jsx', group: 'frontend', x: 100, y: -100, size: 8 },
+            { id: 'AdminDashboard.jsx', group: 'frontend', x: 100, y: 100, size: 8 },
+            { id: 'Workouts.jsx', group: 'frontend', x: 180, y: -50, size: 6 },
+            { id: 'Nutrition.jsx', group: 'frontend', x: 180, y: 0, size: 6 },
+            { id: 'Profile.jsx', group: 'frontend', x: 180, y: 50, size: 6 },
+            { id: 'Loader.jsx', group: 'frontend', x: 0, y: 150, size: 5 },
+            
+            // BACKEND CLUSTER
+            { id: 'index.js (Server)', group: 'backend', x: 0, y: 300, size: 10 },
+            { id: 'authRoutes.js', group: 'backend', x: -120, y: 350, size: 7 },
+            { id: 'workoutRoutes.js', group: 'backend', x: 0, y: 400, size: 7 },
+            { id: 'statsRoutes.js', group: 'backend', x: 120, y: 350, size: 7 },
+            { id: 'adminRoutes.js', group: 'backend', x: 120, y: 450, size: 7 },
+
+            // DATA CLUSTER
+            { id: 'User.js (Model)', group: 'data', x: -120, y: 500, size: 8 },
+            { id: 'Workout.js (Model)', group: 'data', x: 0, y: 550, size: 8 },
+            { id: 'DailyStats.js (Model)', group: 'data', x: 120, y: 500, size: 8 },
+            { id: 'MongoDB Atlas', group: 'data', x: 0, y: 650, size: 12 },
+        ];
+
+        const links = [
+            { source: 'App.jsx', target: 'AuthContext.jsx' },
+            { source: 'App.jsx', target: 'Login.jsx' },
+            { source: 'App.jsx', target: 'Signup.jsx' },
+            { source: 'App.jsx', target: 'Dashboard.jsx' },
+            { source: 'App.jsx', target: 'AdminDashboard.jsx' },
+            { source: 'App.jsx', target: 'Loader.jsx' },
+            { source: 'Dashboard.jsx', target: 'Workouts.jsx' },
+            { source: 'Dashboard.jsx', target: 'Nutrition.jsx' },
+            { source: 'Dashboard.jsx', target: 'Profile.jsx' },
+            { source: 'Login.jsx', target: 'index.js (Server)' },
+            { source: 'Signup.jsx', target: 'index.js (Server)' },
+            { source: 'Dashboard.jsx', target: 'index.js (Server)' },
+            { source: 'AdminDashboard.jsx', target: 'index.js (Server)' },
+            { source: 'index.js (Server)', target: 'authRoutes.js' },
+            { source: 'index.js (Server)', target: 'workoutRoutes.js' },
+            { source: 'index.js (Server)', target: 'statsRoutes.js' },
+            { source: 'index.js (Server)', target: 'adminRoutes.js' },
+            { source: 'authRoutes.js', target: 'User.js (Model)' },
+            { source: 'workoutRoutes.js', target: 'Workout.js (Model)' },
+            { source: 'statsRoutes.js', target: 'DailyStats.js (Model)' },
+            { source: 'adminRoutes.js', target: 'User.js (Model)' },
+            { source: 'User.js (Model)', target: 'MongoDB Atlas' },
+            { source: 'Workout.js (Model)', target: 'MongoDB Atlas' },
+            { source: 'DailyStats.js (Model)', target: 'MongoDB Atlas' },
+        ];
+
+        let offset = { x: 0, y: 0 };
+        let isDragging = false;
+        let lastMouse = { x: 0, y: 0 };
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            offset.x = width / 2;
+            offset.y = height / 4;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        function draw() {
+            ctx.fillStyle = '#05080f';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw Links
+            ctx.lineWidth = 1;
+            links.forEach(link => {
+                const s = nodes.find(n => n.id === link.source);
+                const t = nodes.find(n => n.id === link.target);
+                
+                const grad = ctx.createLinearGradient(
+                    s.x + offset.x, s.y + offset.y, 
+                    t.x + offset.x, t.y + offset.y
+                );
+                grad.addColorStop(0, getColor(s.group, 0.2));
+                grad.addColorStop(1, getColor(t.group, 0.2));
+                
+                ctx.strokeStyle = grad;
+                ctx.beginPath();
+                ctx.moveTo(s.x + offset.x, s.y + offset.y);
+                ctx.lineTo(t.x + offset.x, t.y + offset.y);
+                ctx.stroke();
+
+                // Animated pulse on line
+                const time = Date.now() * 0.002;
+                const pulseX = s.x + (t.x - s.x) * ((time % 1));
+                const pulseY = s.y + (t.y - s.y) * ((time % 1));
+                ctx.fillStyle = getColor(s.group, 0.5);
+                ctx.beginPath();
+                ctx.arc(pulseX + offset.x, pulseY + offset.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw Nodes
+            nodes.forEach(node => {
+                const x = node.x + offset.x;
+                const y = node.y + offset.y;
+
+                // Glow
+                const grad = ctx.createRadialGradient(x, y, 0, x, y, node.size * 3);
+                grad.addColorStop(0, getColor(node.group, 0.3));
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(x, y, node.size * 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Node Body
+                ctx.fillStyle = getColor(node.group, 1);
+                ctx.beginPath();
+                ctx.arc(x, y, node.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Label
+                ctx.fillStyle = 'white';
+                ctx.font = '700 10px DM Sans';
+                ctx.textAlign = 'center';
+                ctx.fillText(node.id, x, y + node.size + 15);
+            });
+
+            requestAnimationFrame(draw);
+        }
+
+        function getColor(group, alpha) {
+            if (group === 'frontend') return `rgba(0, 255, 137, ${alpha})`;
+            if (group === 'backend') return `rgba(0, 212, 255, ${alpha})`;
+            if (group === 'data') return `rgba(255, 0, 122, ${alpha})`;
+            return `rgba(255, 255, 255, ${alpha})`;
+        }
+
+        canvas.addEventListener('mousedown', e => {
+            isDragging = true;
+            lastMouse = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (isDragging) {
+                offset.x += e.clientX - lastMouse.x;
+                offset.y += e.clientY - lastMouse.y;
+                lastMouse = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        draw();
+    </script>
+</body>
+</html>
