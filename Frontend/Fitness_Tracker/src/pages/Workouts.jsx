@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Search, Filter, Play, Clock, Flame, Dumbbell, History } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import API_BASE_URL from '../api/config';
+import Loader from '../components/Loader';
 
 const Workouts = () => {
   const { user } = useAuth();
@@ -51,10 +52,9 @@ const Workouts = () => {
       <div className="section-label"><History size={16} style={{marginRight: '8px'}} /> ALL ACTIVITIES</div>
       <div className="workout-list-container">
         {loading ? (
-             <div className="workout-card" style={{textAlign: 'center', padding: '40px'}}>
-                <Dumbbell className="animate-spin" style={{margin: '0 auto 15px', color: 'var(--accent-green)'}} />
-                <p>Loading your training data...</p>
-             </div>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+                <Loader text="Loading your training data..." />
+            </div>
         ) : workouts.length > 0 ? workouts.map((w, i) => (
              <DetailedWorkoutCard key={i} workout={w} />
         )) : (

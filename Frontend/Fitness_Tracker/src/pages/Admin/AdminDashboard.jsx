@@ -7,6 +7,7 @@ import {
     Eye, CheckCircle, XCircle, BarChart, Search, Globe, Terminal, Mail 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../../components/Loader';
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
@@ -172,7 +173,11 @@ const AdminDashboard = () => {
                                 </thead>
                                 <tbody>
                                     {loading ? (
-                                        <tr><td colSpan="5" style={{textAlign: 'center', padding: '40px'}}>Loading secure user data...</td></tr>
+                                        <tr>
+                                            <td colSpan="5" style={{padding: '60px'}}>
+                                                <Loader text="Fetching User Intelligence..." />
+                                            </td>
+                                        </tr>
                                     ) : usersList.map(u => (
                                         <tr key={u._id} className={u.isBanned ? 'row-banned' : ''}>
                                             <td>
