@@ -32,40 +32,39 @@ const FullPageLoader = () => (
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <FullPageLoader />;
-  if (!user) return <Navigate to="/login" />;
-  if (user.role === 'admin') return <Navigate to="/admin" />;
+  
+  // If no user, strictly go to login
+  if (!user) return <Navigate to="/login" replace />;
+  
+  // If user is admin, they shouldn't be in user routes
+  if (user.role === 'admin') return <Navigate to="/admin" replace />;
+  
   return children;
 };
 
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <FullPageLoader />;
-  if (!user) return <Navigate to="/login" />;
-  if (user.role !== 'admin') return <Navigate to="/" />;
+  
+  // If no user, strictly go to login
+  if (!user) return <Navigate to="/login" replace />;
+  
+  // If user is not admin, kick them to dashboard
+  if (user.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  
   return children;
 };
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <FullPageLoader />;
+  
+  // If already logged in, take them to their respective dashboard
   if (user) {
-    return user.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/" />;
+    return user.role === 'admin' ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />;
   }
+  
   return children;
-};
-
-const HomeRedirect = () => {
-  const { user, loading } = useAuth();
-  if (loading) return <FullPageLoader />;
-  if (!user) return <Navigate to="/login" />;
-  return user.role === 'admin' ? <Navigate to="/admin" /> : <Layout><Dashboard /></Layout>;
-};
-
-const FallbackRoute = () => {
-  const { user, loading } = useAuth();
-  if (loading) return <FullPageLoader />;
-  if (!user) return <Navigate to="/login" />;
-  return user.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/" />;
 };
 
 function App() {
@@ -76,6 +75,9 @@ function App() {
       {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       <Router>
         <Routes>
+          {/* Entry Point - Always go to Login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
           {/* Public Routes */}
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
@@ -83,7 +85,7 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* Protected User Routes */}
-          <Route path="/" element={<HomeRedirect />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
           <Route path="/workouts" element={<ProtectedRoute><Layout><Workouts /></Layout></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><Layout><Progress /></Layout></ProtectedRoute>} />
           <Route path="/nutrition" element={<ProtectedRoute><Layout><Nutrition /></Layout></ProtectedRoute>} />
@@ -92,8 +94,8 @@ function App() {
           {/* Protected Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           
-          {/* Catch-all Route */}
-          <Route path="*" element={<FallbackRoute />} />
+          {/* Catch-all Route - Redirect to Login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
     </AuthProvider>
