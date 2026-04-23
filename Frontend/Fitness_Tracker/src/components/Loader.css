@@ -68,31 +68,52 @@
 /* ADVANCED BIOMECHANICS */
 .runner-torso {
   animation: body-drive 0.4s infinite ease-in-out alternate;
+  transform-origin: 32px 35px;
 }
 
 .runner-leg-back {
-  animation: leg-drive-back 0.5s infinite linear;
+  animation: leg-drive-back 0.6s infinite linear;
+  transform-origin: 32px 35px;
 }
 
 .runner-leg-front {
-  animation: leg-drive-front 0.5s infinite linear;
+  animation: leg-drive-front 0.6s infinite linear;
+  transform-origin: 32px 35px;
+}
+
+.runner-arm-back {
+  animation: arm-drive-back 0.6s infinite ease-in-out;
+  transform-origin: 32px 20px;
+}
+
+.runner-arm-front {
+  animation: arm-drive-front 0.6s infinite ease-in-out;
+  transform-origin: 32px 20px;
 }
 
 @keyframes body-drive {
-  from { transform: translateY(0) rotate(-2deg); }
-  to { transform: translateY(-6px) rotate(2deg); }
+  from { transform: translateY(0) rotate(-1deg); }
+  to { transform: translateY(-4px) rotate(1deg); }
 }
 
 @keyframes leg-drive-back {
-  0% { transform: rotate(-60deg) translateX(0); }
-  50% { transform: rotate(60deg) translateX(5px); }
-  100% { transform: rotate(-60deg) translateX(0); }
+  0%, 100% { transform: rotate(-50deg); }
+  50% { transform: rotate(40deg); }
 }
 
 @keyframes leg-drive-front {
-  0% { transform: rotate(60deg) translateX(5px); }
-  50% { transform: rotate(-60deg) translateX(0); }
-  100% { transform: rotate(60deg) translateX(5px); }
+  0%, 100% { transform: rotate(40deg); }
+  50% { transform: rotate(-50deg); }
+}
+
+@keyframes arm-drive-back {
+  0%, 100% { transform: rotate(40deg); }
+  50% { transform: rotate(-40deg); }
+}
+
+@keyframes arm-drive-front {
+  0%, 100% { transform: rotate(-40deg); }
+  50% { transform: rotate(40deg); }
 }
 
 /* TYPOGRAPHY */
