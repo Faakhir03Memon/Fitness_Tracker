@@ -23,7 +23,7 @@ const Login = () => {
             const { data } = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
             login(data);
             if (data.role === 'admin') navigate('/admin');
-            else navigate('/');
+            else navigate('/dashboard');
         } catch (err) {
             if (err.response?.data?.notVerified) {
                 setNotVerified(true);
