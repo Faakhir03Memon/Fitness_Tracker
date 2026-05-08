@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Camera, Settings, Shield, Bell, Trophy, LogOut, Save, X, User as UserIcon, Mail, Ruler, Weight, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import API_BASE_URL from '../api/config';
 const Profile = () => {
   const { user, login, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -14,8 +15,29 @@ const Profile = () => {
     height: user?.height || '',
     age: user?.age || '',
     gender: user?.gender || '',
-    password: ''
+    password: '',
+    avatar: user?.avatar || ''
   });
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result;
+        setFormData(prev => ({ ...prev, avatar: base64String }));
+        try {
+          const config = { headers: { Authorization: `Bearer ${user.token}` } };
+          const { data } = await axios.put(`${API_BASE_URL}/api/auth/profile`, { ...formData, avatar: base64String }, config);
+          login(data);
+          setMessage({ type: 'success', text: 'Profile picture updated!' });
+        } catch (err) {
+          setMessage({ type: 'error', text: 'Failed to upload profile picture' });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   const [message, setMessage] = useState({ type: '', text: '' });
 
   const handleUpdate = async (e) => {
@@ -65,13 +87,14 @@ const Profile = () => {
       <div className="profile-hero-card">
         <div className="hero-content">
           <div className="avatar-wrapper">
-            <div className="avatar-main">
-              {user?.name?.charAt(0) || 'U'}
+            <div className="avatar-main" style={formData.avatar || user?.avatar ? { backgroundImage: `url(${formData.avatar || user?.avatar})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : {}}>
+              {!(formData.avatar || user?.avatar) && (user?.name?.charAt(0) || 'U')}
               <div className="avatar-ring"></div>
             </div>
-            <button className="avatar-edit-btn">
+            <button className="avatar-edit-btn" onClick={() => fileInputRef.current.click()}>
               <Camera size={14} />
             </button>
+            <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleAvatarChange} />
           </div>
 
           <div className="user-info-main">
