@@ -17,7 +17,7 @@ const createTransporter = () => {
 // Send verification email on signup
 const sendVerificationEmail = async (toEmail, name, token) => {
     const transporter = createTransporter();
-    const verifyLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email/${token}`;
+    const verifyLink = `http://localhost:5173/verify-email/${token}`;
 
     await transporter.sendMail({
         from: `"FitTrack Official Support" <${process.env.EMAIL_USER}>`,
@@ -49,7 +49,7 @@ const sendVerificationEmail = async (toEmail, name, token) => {
 // Send password reset email
 const sendPasswordResetEmail = async (toEmail, name, token) => {
     const transporter = createTransporter();
-    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${token}`;
+    const resetLink = `http://localhost:5173/reset-password/${token}`;
 
     await transporter.sendMail({
         from: `"FitTrack Official Support" <${process.env.EMAIL_USER}>`,
