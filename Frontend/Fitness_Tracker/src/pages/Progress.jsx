@@ -7,11 +7,11 @@ import API_BASE_URL from '../api/config';
 const Progress = () => {
   const { user } = useAuth();
   const [weeklyData, setWeeklyData] = useState([]);
-  const [goals] = useState([
-    { name: 'Weight Loss', pct: 72, color: 'var(--accent-green)', icon: <TrendingUp size={16}/> },
-    { name: 'Muscle Gain', pct: 58, color: 'var(--accent-cyan)', icon: <Activity size={16}/> },
-    { name: 'Endurance', pct: 85, color: 'var(--accent-purple)', icon: <Award size={16}/> },
-    { name: 'Flexibility', pct: 40, color: 'var(--accent-orange)', icon: <Calendar size={16}/> }
+  const [goals, setGoals] = useState([
+    { name: 'Weight Loss', pct: 0, color: 'var(--accent-green)', icon: <TrendingUp size={16}/> },
+    { name: 'Muscle Gain', pct: 0, color: 'var(--accent-cyan)', icon: <Activity size={16}/> },
+    { name: 'Endurance', pct: 0, color: 'var(--accent-purple)', icon: <Award size={16}/> },
+    { name: 'Flexibility', pct: 0, color: 'var(--accent-orange)', icon: <Calendar size={16}/> }
   ]);
 
   useEffect(() => {
@@ -19,26 +19,43 @@ const Progress = () => {
         if (!user || !user.token) return;
         try {
             const authConfig = { headers: { Authorization: `Bearer ${user.token}` } };
-            const res = await axios.get(`${API_BASE_URL}/api/stats/range/weekly`, authConfig);
+            const [statsRes, workoutsRes] = await Promise.all([
+                axios.get(`${API_BASE_URL}/api/stats/range/weekly`, authConfig),
+                axios.get(`${API_BASE_URL}/api/workouts`, authConfig)
+            ]);
             
-            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            const todayIdx = new Date().getDay(); 
-            
-            const data = days.map((dayName, idx) => {
-                const found = res.data.find(item => {
-                    const d = new Date(item.date).getDay();
-                    const adjustedD = d === 0 ? 6 : d - 1; 
-                    return adjustedD === idx;
-                });
-                
+            const daysArr = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const last7Days = Array.from({length: 7}).map((_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (6 - i));
+                return d;
+            });
+
+            const data = last7Days.map(dateObj => {
+                const dateStr = dateObj.toISOString().split('T')[0];
+                const found = statsRes.data.find(item => item.date && item.date.startsWith(dateStr));
+                const calories = found ? found.caloriesBurned || 0 : 0;
                 return {
-                    day: dayName,
-                    val: found ? Math.max(15, Math.min(((found.caloriesBurned || 0) / 2500) * 100, 100)) : Math.floor(Math.random() * 30) + 10,
-                    active: idx === (todayIdx === 0 ? 6 : todayIdx - 1)
+                    day: daysArr[dateObj.getDay()],
+                    val: Math.min((calories / 1000) * 100, 100),
+                    active: dateObj.toDateString() === new Date().toDateString()
                 };
             });
             
             setWeeklyData(data);
+
+            const allWorkouts = workoutsRes.data;
+            const cardioCount = allWorkouts.filter(w => w.type === 'Cardio' || w.type === 'HIIT').length;
+            const strengthCount = allWorkouts.filter(w => w.type === 'Strength Training').length;
+            const yogaCount = allWorkouts.filter(w => w.type === 'Yoga').length;
+            const totalDuration = allWorkouts.reduce((acc, w) => acc + Number(w.duration || 0), 0);
+
+            setGoals([
+                { name: 'Weight Loss', pct: Math.min(Math.round((cardioCount / 10) * 100), 100) || 0, color: 'var(--accent-green)', icon: <TrendingUp size={16}/> },
+                { name: 'Muscle Gain', pct: Math.min(Math.round((strengthCount / 12) * 100), 100) || 0, color: 'var(--accent-cyan)', icon: <Activity size={16}/> },
+                { name: 'Endurance', pct: Math.min(Math.round((totalDuration / 600) * 100), 100) || 0, color: 'var(--accent-purple)', icon: <Award size={16}/> },
+                { name: 'Flexibility', pct: Math.min(Math.round((yogaCount / 5) * 100), 100) || 0, color: 'var(--accent-orange)', icon: <Calendar size={16}/> }
+            ]);
         } catch (err) {
             console.error(err);
         }
@@ -102,7 +119,7 @@ const Progress = () => {
                     <div className="goal-bar-fill" style={{ width: `${goal.pct}%`, background: goal.color }}></div>
                 </div>
                 <div style={{fontSize: '11px', color: 'var(--text-muted)', marginTop: '12px', fontWeight: '600'}}>
-                    Approx. {Math.round(goal.pct * 0.3)} days remaining to target
+                    Approx. {Math.max(0, 30 - Math.round((goal.pct / 100) * 30))} days remaining to target
                 </div>
             </div>
         ))}
