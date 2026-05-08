@@ -13,6 +13,13 @@ const Dashboard = () => {
     water: 0
   });
 
+  const [goals, setGoals] = useState({
+    weightLoss: 0,
+    muscleGain: 0,
+    endurance: 0,
+    flexibility: 0
+  });
+
   const [workouts, setWorkouts] = useState([]);
   const [weeklyBars, setWeeklyBars] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,12 +60,37 @@ const Dashboard = () => {
       
       setWorkouts(workoutsRes.data.slice(0, 3));
       
-      const chartData = weeklyRes.data.length > 0 ? weeklyRes.data.map(item => ({
-        day: new Date(item.date).toLocaleDateString('en-US', { weekday: 'short' }),
-        height: Math.min(((item.caloriesBurned || 0) / 3000) * 100, 100) || Math.floor(Math.random() * 40) + 30
-      })) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => ({ day: d, height: 30 }));
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const last7Days = Array.from({length: 7}).map((_, i) => {
+          const d = new Date();
+          d.setDate(d.getDate() - (6 - i));
+          return d;
+      });
+
+      const chartData = last7Days.map(dateObj => {
+          const dateStr = dateObj.toISOString().split('T')[0];
+          const found = weeklyRes.data.find(item => item.date && item.date.startsWith(dateStr));
+          const calories = found ? found.caloriesBurned || 0 : 0;
+          return {
+              day: days[dateObj.getDay()],
+              height: Math.min((calories / 1000) * 100, 100)
+          };
+      });
 
       setWeeklyBars(chartData);
+
+      const allWorkouts = workoutsRes.data;
+      const cardioCount = allWorkouts.filter(w => w.type === 'Cardio' || w.type === 'HIIT').length;
+      const strengthCount = allWorkouts.filter(w => w.type === 'Strength Training').length;
+      const yogaCount = allWorkouts.filter(w => w.type === 'Yoga').length;
+      const totalDuration = allWorkouts.reduce((acc, w) => acc + Number(w.duration || 0), 0);
+      
+      setGoals({
+          weightLoss: Math.min(Math.round((cardioCount / 10) * 100), 100) || 0,
+          muscleGain: Math.min(Math.round((strengthCount / 12) * 100), 100) || 0,
+          endurance: Math.min(Math.round((totalDuration / 600) * 100), 100) || 0,
+          flexibility: Math.min(Math.round((yogaCount / 5) * 100), 100) || 0
+      });
 
     } catch (err) {
       console.error("Error fetching dashboard data", err);
@@ -157,10 +189,10 @@ const Dashboard = () => {
              <div className="section-title" style={{fontFamily: 'Bebas Neue', fontSize: '20px', letterSpacing: '1px'}}>MONTHLY GOALS STATUS</div>
              <Target size={20} color="var(--text-muted)" />
           </div>
-          <GoalItem name="Weight Loss" pct={72} color="var(--accent-green)" />
-          <GoalItem name="Muscle Gain" pct={58} color="var(--accent-cyan)" />
-          <GoalItem name="Endurance" pct={85} color="var(--accent-purple)" />
-          <GoalItem name="Flexibility" pct={40} color="var(--accent-orange)" />
+          <GoalItem name="Weight Loss" pct={goals.weightLoss} color="var(--accent-green)" />
+          <GoalItem name="Muscle Gain" pct={goals.muscleGain} color="var(--accent-cyan)" />
+          <GoalItem name="Endurance" pct={goals.endurance} color="var(--accent-purple)" />
+          <GoalItem name="Flexibility" pct={goals.flexibility} color="var(--accent-orange)" />
         </div>
       </div>
 
