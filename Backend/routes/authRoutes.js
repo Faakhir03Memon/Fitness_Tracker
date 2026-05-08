@@ -167,6 +167,25 @@ router.get('/profile', protect, async (req, res) => {
 // @route   PUT /api/auth/profile
 // @desc    Update user profile
 router.put('/profile', protect, async (req, res) => {
+    if (req.user.role === 'admin') {
+        const admin = await Admin.findById(req.user._id);
+        if (admin) {
+            admin.name = req.body.name || admin.name;
+            admin.email = req.body.email || admin.email;
+            if (req.body.avatar !== undefined) admin.avatar = req.body.avatar;
+            if (req.body.password) admin.password = req.body.password;
+            const updatedAdmin = await admin.save();
+            return res.json({
+                _id: updatedAdmin._id,
+                name: updatedAdmin.name,
+                email: updatedAdmin.email,
+                avatar: updatedAdmin.avatar,
+                role: 'admin',
+                token: generateToken(updatedAdmin._id, 'admin'),
+            });
+        }
+    }
+
     const user = await User.findById(req.user._id);
     if (user) {
         user.name = req.body.name || user.name;
