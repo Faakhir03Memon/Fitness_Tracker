@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Workout = require('../models/Workout');
 const DailyStats = require('../models/DailyStats');
 const Meal = require('../models/Meal');
+const Food = require('../models/Food');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 
 // Get all users
@@ -68,6 +69,44 @@ router.get('/stats', protect, adminOnly, async (req, res) => {
         const totalWorkouts = await Workout.countDocuments();
         const totalMeals = await Meal.countDocuments();
         res.json({ totalUsers, totalWorkouts, totalMeals });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Food CRUD Routes
+router.get('/foods', protect, adminOnly, async (req, res) => {
+    try {
+        const foods = await Food.find();
+        res.json(foods);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+router.post('/foods', protect, adminOnly, async (req, res) => {
+    try {
+        const newFood = new Food(req.body);
+        const savedFood = await newFood.save();
+        res.status(201).json(savedFood);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+router.put('/foods/:id', protect, adminOnly, async (req, res) => {
+    try {
+        const updatedFood = await Food.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedFood);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+router.delete('/foods/:id', protect, adminOnly, async (req, res) => {
+    try {
+        await Food.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Food deleted' });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
