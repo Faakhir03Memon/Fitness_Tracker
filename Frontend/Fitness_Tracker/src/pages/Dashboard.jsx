@@ -150,10 +150,6 @@ const Dashboard = () => {
                 <GlassWater size={16} style={{marginRight: '8px'}} /> + Glass
             </button>
             <div className="topbar-right">
-                <div className="streak-badge">
-                   <div className="streak-dot"></div>
-                   Active Session
-                </div>
                 <div className="avatar" style={{ marginLeft: '10px', ...(user?.avatar ? { backgroundImage: `url(${user.avatar})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : {}) }}>{!(user?.avatar) && (user?.name?.charAt(0) || 'U')}</div>
             </div>
         </div>
