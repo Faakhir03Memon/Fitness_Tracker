@@ -246,6 +246,14 @@ const Profile = () => {
         }
         @keyframes spin { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
         
+        .avatar-edit-btn {
+            position: absolute; bottom: -5px; right: -5px; width: 40px; height: 40px;
+            background: var(--accent-green); color: black; border: none; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            z-index: 10; box-shadow: 0 4px 15px rgba(0, 255, 135, 0.4); transition: 0.3s;
+        }
+        .avatar-edit-btn:hover { transform: scale(1.1); }
+        
         .user-name { font-family: 'Bebas Neue'; font-size: 42px; letter-spacing: 2px; margin-bottom: 8px; }
         .badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-right: 8px; }
         .badge.eco { background: rgba(0, 255, 135, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 255, 135, 0.2); }
