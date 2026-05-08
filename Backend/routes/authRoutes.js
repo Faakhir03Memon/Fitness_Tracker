@@ -82,6 +82,7 @@ router.post('/login', async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
+            avatar: user.avatar,
             role: 'user',
             token: generateToken(user._id, 'user'),
         });
@@ -174,6 +175,7 @@ router.put('/profile', protect, async (req, res) => {
         user.height = req.body.height !== undefined ? req.body.height : user.height;
         user.age = req.body.age !== undefined ? req.body.age : user.age;
         user.gender = req.body.gender !== undefined ? req.body.gender : user.gender;
+        if (req.body.avatar !== undefined) user.avatar = req.body.avatar;
         if (req.body.password) user.password = req.body.password;
         const updatedUser = await user.save();
         res.json({
@@ -184,6 +186,7 @@ router.put('/profile', protect, async (req, res) => {
             height: updatedUser.height,
             age: updatedUser.age,
             gender: updatedUser.gender,
+            avatar: updatedUser.avatar,
             role: 'user',
             token: generateToken(updatedUser._id, 'user'),
         });
