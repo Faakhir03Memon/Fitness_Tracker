@@ -154,7 +154,7 @@ const Dashboard = () => {
                    <div className="streak-dot"></div>
                    Active Session
                 </div>
-                <div className="avatar" style={{ marginLeft: '10px' }}>{user?.name?.charAt(0) || 'U'}</div>
+                <div className="avatar" style={{ marginLeft: '10px', ...(user?.avatar ? { backgroundImage: `url(${user.avatar})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : {}) }}>{!(user?.avatar) && (user?.name?.charAt(0) || 'U')}</div>
             </div>
         </div>
       </div>
