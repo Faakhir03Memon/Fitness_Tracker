@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import API_BASE_URL from '../../api/config';
 import { 
     ShieldCheck, Users, Activity, LogOut, Trash2, Ban, 
-    Eye, CheckCircle, XCircle, BarChart, Search, Globe, Terminal, Mail, User as UserIcon 
+    Eye, CheckCircle, XCircle, BarChart, Search, Globe, Terminal, Mail, User as UserIcon, Utensils, Plus, Edit2 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/Loader';
@@ -17,6 +17,11 @@ const AdminDashboard = () => {
     const [usersList, setUsersList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedUserLogs, setSelectedUserLogs] = useState(null);
+
+    const [foodsList, setFoodsList] = useState([]);
+    const [isEditingFood, setIsEditingFood] = useState(false);
+    const [foodForm, setFoodForm] = useState({ name: '', cal: '', pro: '', carb: '', fat: '', category: 'Breakfast' });
+    const [editingFoodId, setEditingFoodId] = useState(null);
 
     const [adminForm, setAdminForm] = useState({
         name: user?.name || '',
@@ -33,6 +38,8 @@ const AdminDashboard = () => {
         fetchGlobalStats();
         if (view === 'users') {
             fetchUsers();
+        } else if (view === 'foods') {
+            fetchFoods();
         }
     }, [view]);
 
@@ -54,6 +61,51 @@ const AdminDashboard = () => {
         } catch (err) {
             console.error(err);
             setLoading(false);
+        }
+    };
+
+    const fetchFoods = async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${API_BASE_URL}/api/admin/foods`, authConfig);
+            setFoodsList(res.data);
+            setLoading(false);
+        } catch (err) {
+            console.error(err);
+            setLoading(false);
+        }
+    };
+
+    const handleSaveFood = async (e) => {
+        e.preventDefault();
+        try {
+            if (editingFoodId) {
+                await axios.put(`${API_BASE_URL}/api/admin/foods/${editingFoodId}`, foodForm, authConfig);
+            } else {
+                await axios.post(`${API_BASE_URL}/api/admin/foods`, foodForm, authConfig);
+            }
+            setIsEditingFood(false);
+            setEditingFoodId(null);
+            setFoodForm({ name: '', cal: '', pro: '', carb: '', fat: '', category: 'Breakfast' });
+            fetchFoods();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleEditFood = (food) => {
+        setFoodForm(food);
+        setEditingFoodId(food._id);
+        setIsEditingFood(true);
+    };
+
+    const handleDeleteFood = async (id) => {
+        if(!window.confirm("Delete this food item?")) return;
+        try {
+            await axios.delete(`${API_BASE_URL}/api/admin/foods/${id}`, authConfig);
+            fetchFoods();
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -135,6 +187,12 @@ const AdminDashboard = () => {
                         className={view === 'users' ? 'nav-btn active' : 'nav-btn'}
                     >
                         <Users size={20} /> Users
+                    </button>
+                    <button 
+                        onClick={() => setView('foods')} 
+                        className={view === 'foods' ? 'nav-btn active' : 'nav-btn'}
+                    >
+                        <Utensils size={20} /> Food Database
                     </button>
                     <button 
                         onClick={() => setView('profile')} 
@@ -249,6 +307,89 @@ const AdminDashboard = () => {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                ) : view === 'foods' ? (
+                    <div className="foods-view animate-fade-in">
+                        <div className="admin-table-container">
+                            <div style={{display: 'flex', justifyContent: 'space-between', padding: '0 0 20px 0', alignItems: 'center'}}>
+                                <h2 style={{margin: 0}}>Food Database</h2>
+                                <button onClick={() => { setIsEditingFood(!isEditingFood); setEditingFoodId(null); setFoodForm({ name: '', cal: '', pro: '', carb: '', fat: '', category: 'Breakfast' }); }} className="refresh-btn" style={{display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0, 255, 137, 0.1)', color: '#00ff89'}}>
+                                    {isEditingFood ? 'Close' : <><Plus size={16}/> Add Food</>}
+                                </button>
+                            </div>
+
+                            {isEditingFood && (
+                                <form onSubmit={handleSaveFood} style={{background: '#070b14', padding: '20px', borderRadius: '14px', marginBottom: '20px', border: '1px solid #1e293b'}}>
+                                    <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px'}}>
+                                        <div>
+                                            <label style={{fontSize: '11px', color: '#64748b', fontWeight: 'bold'}}>Food Name</label>
+                                            <input type="text" required value={foodForm.name} onChange={e=>setFoodForm({...foodForm, name: e.target.value})} style={{width: '100%', padding: '10px', background: '#0d111b', border: '1px solid #1e293b', borderRadius: '8px', color: 'white', marginTop: '5px'}}/>
+                                        </div>
+                                        <div>
+                                            <label style={{fontSize: '11px', color: '#64748b', fontWeight: 'bold'}}>Calories (kcal)</label>
+                                            <input type="number" required value={foodForm.cal} onChange={e=>setFoodForm({...foodForm, cal: e.target.value})} style={{width: '100%', padding: '10px', background: '#0d111b', border: '1px solid #1e293b', borderRadius: '8px', color: 'white', marginTop: '5px'}}/>
+                                        </div>
+                                        <div>
+                                            <label style={{fontSize: '11px', color: '#64748b', fontWeight: 'bold'}}>Category</label>
+                                            <select value={foodForm.category} onChange={e=>setFoodForm({...foodForm, category: e.target.value})} style={{width: '100%', padding: '10px', background: '#0d111b', border: '1px solid #1e293b', borderRadius: '8px', color: 'white', marginTop: '5px'}}>
+                                                <option value="Breakfast">Breakfast</option>
+                                                <option value="Lunch/Dinner">Lunch/Dinner</option>
+                                                <option value="Snack">Snack</option>
+                                                <option value="Dessert">Dessert</option>
+                                                <option value="Drink">Drink</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style={{fontSize: '11px', color: '#64748b', fontWeight: 'bold'}}>Protein (g)</label>
+                                            <input type="number" required value={foodForm.pro} onChange={e=>setFoodForm({...foodForm, pro: e.target.value})} style={{width: '100%', padding: '10px', background: '#0d111b', border: '1px solid #1e293b', borderRadius: '8px', color: 'white', marginTop: '5px'}}/>
+                                        </div>
+                                        <div>
+                                            <label style={{fontSize: '11px', color: '#64748b', fontWeight: 'bold'}}>Carbs (g)</label>
+                                            <input type="number" required value={foodForm.carb} onChange={e=>setFoodForm({...foodForm, carb: e.target.value})} style={{width: '100%', padding: '10px', background: '#0d111b', border: '1px solid #1e293b', borderRadius: '8px', color: 'white', marginTop: '5px'}}/>
+                                        </div>
+                                        <div>
+                                            <label style={{fontSize: '11px', color: '#64748b', fontWeight: 'bold'}}>Fats (g)</label>
+                                            <input type="number" required value={foodForm.fat} onChange={e=>setFoodForm({...foodForm, fat: e.target.value})} style={{width: '100%', padding: '10px', background: '#0d111b', border: '1px solid #1e293b', borderRadius: '8px', color: 'white', marginTop: '5px'}}/>
+                                        </div>
+                                    </div>
+                                    <button type="submit" style={{marginTop: '15px', background: '#00ff89', color: 'black', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', border: 'none', cursor: 'pointer'}}>
+                                        {editingFoodId ? 'Update Food' : 'Add Food'}
+                                    </button>
+                                </form>
+                            )}
+
+                            <div style={{maxHeight: '500px', overflowY: 'auto'}}>
+                                <table className="admin-table">
+                                    <thead style={{position: 'sticky', top: 0, background: '#0d111b'}}>
+                                        <tr>
+                                            <th>Food Name</th>
+                                            <th>Category</th>
+                                            <th>Calories</th>
+                                            <th>Macros (P/C/F)</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {loading ? (
+                                            <tr><td colSpan="5"><Loader text="Loading..." /></td></tr>
+                                        ) : foodsList.map(f => (
+                                            <tr key={f._id}>
+                                                <td style={{fontWeight: 'bold', color: 'white'}}>{f.name}</td>
+                                                <td><span className="status-tag active">{f.category}</span></td>
+                                                <td style={{color: '#00ff89', fontFamily: 'Bebas Neue', fontSize: '18px'}}>{f.cal} kcal</td>
+                                                <td style={{fontSize: '12px'}}>{f.pro}g / {f.carb}g / {f.fat}g</td>
+                                                <td>
+                                                    <div className="admin-table-actions">
+                                                        <button onClick={() => handleEditFood(f)} className="icon-btn" title="Edit"><Edit2 size={16}/></button>
+                                                        <button onClick={() => handleDeleteFood(f._id)} className="icon-btn delete-btn" title="Delete"><Trash2 size={16}/></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 ) : (
