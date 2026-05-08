@@ -4,19 +4,27 @@ import { useAuth } from '../../context/AuthContext';
 import API_BASE_URL from '../../api/config';
 import { 
     ShieldCheck, Users, Activity, LogOut, Trash2, Ban, 
-    Eye, CheckCircle, XCircle, BarChart, Search, Globe, Terminal, Mail 
+    Eye, CheckCircle, XCircle, BarChart, Search, Globe, Terminal, Mail, User as UserIcon 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/Loader';
 
 const AdminDashboard = () => {
-    const { user, logout } = useAuth();
+    const { user, logout, login } = useAuth();
     const navigate = useNavigate();
-    const [view, setView] = useState('dashboard'); // 'dashboard' or 'users'
+    const [view, setView] = useState('dashboard'); // 'dashboard', 'users', 'profile'
     const [globalStats, setGlobalStats] = useState({ totalUsers: 0, totalWorkouts: 0, totalMeals: 0 });
     const [usersList, setUsersList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedUserLogs, setSelectedUserLogs] = useState(null);
+
+    const [adminForm, setAdminForm] = useState({
+        name: user?.name || '',
+        email: user?.email || '',
+        password: '',
+        avatar: user?.avatar || ''
+    });
+    const fileInputRef = React.useRef(null);
 
     const authConfig = {
         headers: { Authorization: `Bearer ${user.token}` }
@@ -80,6 +88,29 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleAdminAvatarChange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAdminForm(prev => ({ ...prev, avatar: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleAdminUpdate = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await axios.put(`${API_BASE_URL}/api/auth/profile`, adminForm, authConfig);
+            login(res.data);
+            alert('Admin profile updated successfully');
+        } catch (err) {
+            alert('Update failed');
+            console.error(err);
+        }
+    };
+
     const handleLogout = () => {
         logout();
         navigate('/login');
@@ -104,6 +135,12 @@ const AdminDashboard = () => {
                         className={view === 'users' ? 'nav-btn active' : 'nav-btn'}
                     >
                         <Users size={20} /> Users
+                    </button>
+                    <button 
+                        onClick={() => setView('profile')} 
+                        className={view === 'profile' ? 'nav-btn active' : 'nav-btn'}
+                    >
+                        <UserIcon size={20} /> My Profile
                     </button>
                 </nav>
                 <button onClick={handleLogout} className="logout-btn">
@@ -154,7 +191,7 @@ const AdminDashboard = () => {
                             </table>
                         </div>
                     </div>
-                ) : (
+                ) : view === 'users' ? (
                     <div className="users-view animate-fade-in">
                          <div className="admin-table-container" style={{background: 'rgba(30, 41, 59, 0.5)'}}>
                             <div style={{display: 'flex', justifyContent: 'space-between', padding: '0 0 20px 0'}}>
@@ -212,6 +249,49 @@ const AdminDashboard = () => {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="admin-profile-view animate-fade-in">
+                        <div className="admin-table-container">
+                            <h2 style={{marginBottom: '30px', color: '#94a3b8', fontFamily: 'Bebas Neue', fontSize: '24px', letterSpacing: '1px'}}>Admin Profile Settings</h2>
+                            <form onSubmit={handleAdminUpdate} style={{background: '#0d111b', padding: '0'}}>
+                                <div className="form-group" style={{marginBottom: '25px'}}>
+                                    <label style={{display: 'block', color: '#64748b', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', fontWeight: '800'}}>Profile Picture</label>
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
+                                        <div style={{width: '90px', height: '90px', borderRadius: '25px', background: '#070b14', border: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'}}>
+                                            {adminForm.avatar || user?.avatar ? (
+                                                <img src={adminForm.avatar || user?.avatar} alt="Avatar" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                                            ) : (
+                                                <span style={{fontSize: '32px', fontWeight: 'bold', color: '#00ff89'}}>{user?.name?.charAt(0) || 'A'}</span>
+                                            )}
+                                        </div>
+                                        <button type="button" onClick={() => fileInputRef.current.click()} style={{background: 'rgba(0, 255, 137, 0.1)', color: '#00ff89', border: '1px solid rgba(0, 255, 137, 0.2)', padding: '12px 24px', borderRadius: '12px', cursor: 'pointer', fontWeight: '700', fontSize: '13px', transition: '0.3s'}}>
+                                            Change Picture
+                                        </button>
+                                        <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleAdminAvatarChange} />
+                                    </div>
+                                </div>
+                                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px'}}>
+                                    <div className="form-group">
+                                        <label style={{display: 'block', color: '#64748b', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', fontWeight: '800'}}>Full Name</label>
+                                        <input type="text" value={adminForm.name} onChange={(e) => setAdminForm({...adminForm, name: e.target.value})} style={{width: '100%', padding: '16px', background: '#070b14', border: '1px solid #1e293b', borderRadius: '14px', color: 'white', outline: 'none'}} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label style={{display: 'block', color: '#64748b', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', fontWeight: '800'}}>Email Address</label>
+                                        <input type="email" value={adminForm.email} onChange={(e) => setAdminForm({...adminForm, email: e.target.value})} style={{width: '100%', padding: '16px', background: '#070b14', border: '1px solid #1e293b', borderRadius: '14px', color: 'white', outline: 'none'}} />
+                                    </div>
+                                    <div className="form-group" style={{gridColumn: '1 / -1'}}>
+                                        <label style={{display: 'block', color: '#64748b', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', fontWeight: '800'}}>New Password</label>
+                                        <input type="password" value={adminForm.password} onChange={(e) => setAdminForm({...adminForm, password: e.target.value})} placeholder="Leave blank to keep current password" style={{width: '100%', padding: '16px', background: '#070b14', border: '1px solid #1e293b', borderRadius: '14px', color: 'white', outline: 'none'}} />
+                                    </div>
+                                </div>
+                                <div style={{marginTop: '35px'}}>
+                                    <button type="submit" style={{background: '#00ff89', color: 'black', border: 'none', padding: '16px 32px', borderRadius: '14px', fontWeight: '800', cursor: 'pointer', fontSize: '15px', display: 'inline-block', transition: '0.3s'}}>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 )}
