@@ -18,12 +18,15 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+const foodRoutes = require('./routes/foodRoutes');
+
 // Routes
 app.use('/api/workouts', workoutRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/meals', mealRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/foods', foodRoutes);
 
 // Health check
 app.get('/', (req, res) => {
