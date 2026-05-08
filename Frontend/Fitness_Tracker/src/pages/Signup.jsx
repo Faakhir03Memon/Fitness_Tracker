@@ -3,10 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { 
-    UserPlus, Mail, Lock, User, RefreshCw, CheckCircle2, ShieldCheck, X,
-    Dumbbell, Flame, Activity, Heart, Apple, Timer, Zap, Star, Coffee, 
-    Smartphone, Bike, Trophy, Target, Salad, ZapOff, Utensils, Footprints,
-    Brain, Droplets, Moon, Sun, Anchor, Award, Camera, Music, Map, Ruler, Weight, Calendar
+    UserPlus, Mail, Lock, User, Ruler, Weight, Calendar
 } from 'lucide-react';
 import API_BASE_URL from '../api/config';
 
@@ -17,100 +14,16 @@ const Signup = () => {
     const [weight, setWeight] = useState('');
     const [height, setHeight] = useState('');
     const [age, setAge] = useState('');
-    const [gender, setGender] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
-    const [emailSent, setEmailSent] = useState(false);
+     const [gender, setGender] = useState('');
+     const [error, setError] = useState('');
+     const [loading, setLoading] = useState(false);
+     const [submitted, setSubmitted] = useState(false);
+     const [emailSent, setEmailSent] = useState(false);
     
-    // Captcha States
-    const [showCaptcha, setShowCaptcha] = useState(false);
-    const [isVerified, setIsVerified] = useState(false);
-    const [captchaGrid, setCaptchaGrid] = useState([]);
-    const [targetCategory, setTargetCategory] = useState('');
-    const [selectedIndices, setSelectedIndices] = useState([]);
-    const [captchaError, setCaptchaError] = useState('');
-
     const navigate = useNavigate();
-
-    const ICON_POOL = [
-        { name: 'Fitness Gear', icon: <Dumbbell size={28} />, keywords: ['Dumbbell'] },
-        { name: 'Energy', icon: <Flame size={28} />, keywords: ['Flame'] },
-        { name: 'Workout', icon: <Activity size={28} />, keywords: ['Activity'] },
-        { name: 'Health', icon: <Heart size={28} />, keywords: ['Heart'] },
-        { name: 'Nutrition', icon: <Apple size={28} />, keywords: ['Apple'] },
-        { name: 'Timing', icon: <Timer size={28} />, keywords: ['Timer'] },
-        { name: 'Power', icon: <Zap size={28} />, keywords: ['Zap'] },
-        { name: 'Achievement', icon: <Star size={28} />, keywords: ['Star'] },
-        { name: 'Drink', icon: <Coffee size={28} />, keywords: ['Coffee'] },
-        { name: 'Cycling', icon: <Bike size={28} />, keywords: ['Bike'] },
-        { name: 'Victory', icon: <Trophy size={28} />, keywords: ['Trophy'] },
-        { name: 'Goals', icon: <Target size={28} />, keywords: ['Target'] },
-        { name: 'Diet', icon: <Salad size={28} />, keywords: ['Salad'] },
-        { name: 'Meal', icon: <Utensils size={28} />, keywords: ['Utensils'] },
-        { name: 'Walking', icon: <Footprints size={28} />, keywords: ['Footprints'] },
-        { name: 'Mindset', icon: <Brain size={28} />, keywords: ['Brain'] },
-        { name: 'Hydration', icon: <Droplets size={28} />, keywords: ['Droplets'] },
-        { name: 'Rest', icon: <Moon size={28} />, keywords: ['Moon'] },
-        { name: 'Morning', icon: <Sun size={28} />, keywords: ['Sun'] },
-        { name: 'Sea Sport', icon: <Anchor size={28} />, keywords: ['Anchor'] },
-        { name: 'Medals', icon: <Award size={28} />, keywords: ['Award'] },
-        { name: 'Capture', icon: <Camera size={28} />, keywords: ['Camera'] },
-        { name: 'Rhythm', icon: <Music size={28} />, keywords: ['Music'] },
-        { name: 'Travel', icon: <Map size={28} />, keywords: ['Map'] }
-    ];
-
-    const generateCaptcha = () => {
-        const target = ICON_POOL[Math.floor(Math.random() * ICON_POOL.length)];
-        setTargetCategory(target.name);
-        
-        let grid = [];
-        let targetCount = 0;
-        
-        for (let i = 0; i < 9; i++) {
-            const isTarget = Math.random() > 0.65 || (targetCount < 2 && i > 6);
-            if (isTarget) {
-                grid.push(target);
-                targetCount++;
-            } else {
-                let other;
-                do {
-                    other = ICON_POOL[Math.floor(Math.random() * ICON_POOL.length)];
-                } while (other.name === target.name);
-                grid.push(other);
-            }
-        }
-        setCaptchaGrid(grid);
-        setSelectedIndices([]);
-        setCaptchaError('');
-    };
-
-    const handleVerifyCaptcha = () => {
-        const correctIndices = captchaGrid
-            .map((item, idx) => item.name === targetCategory ? idx : null)
-            .filter(idx => idx !== null);
-        
-        const isCorrect = correctIndices.length === selectedIndices.length && 
-                         selectedIndices.every(idx => correctIndices.includes(idx));
-
-        if (isCorrect) {
-            setIsVerified(true);
-            setShowCaptcha(false);
-        } else {
-            setCaptchaError('Verification failed. Try again.');
-            generateCaptcha();
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-
-        if (!isVerified) {
-            setError('Please verify that you are not a robot.');
-            return;
-        }
-
         setLoading(true);
         try {
             const { data } = await axios.post(`${API_BASE_URL}/api/auth/signup`, { 
@@ -120,10 +33,10 @@ const Signup = () => {
             setSubmitted(true);
         } catch (err) {
             setError(err.response?.data?.message || 'Error occurred during signup');
-            setIsVerified(false);
         } finally {
             setLoading(false);
         }
+        
     };
 
     if (submitted) {
@@ -228,30 +141,7 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    {/* I am not a robot checkbox */}
-                    <div style={{ 
-                        marginBottom: '25px', padding: '15px 20px', background: '#080c10', 
-                        border: '1px solid #1f2937', borderRadius: '12px', display: 'flex', 
-                        alignItems: 'center', justifyContent: 'space-between', cursor: isVerified ? 'default' : 'pointer',
-                        transition: '0.3s'
-                    }} onClick={() => { if(!isVerified) { generateCaptcha(); setShowCaptcha(true); } }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                            <div style={{ 
-                                width: '24px', height: '24px', border: '2px solid #1f2937', 
-                                borderRadius: '4px', background: isVerified ? '#00ff89' : 'transparent',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s'
-                            }}>
-                                {isVerified && <CheckCircle2 size={16} color="black" />}
-                            </div>
-                            <span style={{ fontSize: '14px', fontWeight: '600', color: isVerified ? 'white' : '#64748b' }}>
-                                I'm not a robot
-                            </span>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <ShieldCheck size={24} color={isVerified ? '#00ff89' : '#1f2937'} />
-                            <div style={{ fontSize: '8px', color: '#475569', marginTop: '2px' }}>FIT-CAPTCHA</div>
-                        </div>
-                    </div>
+
 
                     {error && (
                         <div style={{ color: '#ef4444', fontSize: '12px', fontWeight: '600', marginBottom: '15px', background: 'rgba(239,68,68,0.05)', padding: '10px', borderRadius: '8px', textAlign: 'center', border: '1px solid rgba(239,68,68,0.1)' }}>
@@ -261,7 +151,7 @@ const Signup = () => {
 
                     <button type="submit" disabled={loading} style={{
                         width: '100%', padding: '16px', background: '#00ff89', color: 'black',
-                        border: 'none', borderRadius: '12px', fontWeight: '800', fontSize: '14px', cursor: 'pointer', opacity: isVerified ? 1 : 0.5
+                        border: 'none', borderRadius: '12px', fontWeight: '800', fontSize: '14px', cursor: 'pointer'
                     }}>
                         {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
                     </button>
@@ -272,50 +162,7 @@ const Signup = () => {
                 </div>
             </div>
 
-            {/* Captcha Popup Modal */}
-            {showCaptcha && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-                    <div style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: '24px', width: '100%', maxWidth: '380px', padding: '30px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '25px' }}>
-                            <div>
-                                <h3 style={{ margin: 0, color: 'white', fontSize: '12px', fontWeight: '800', letterSpacing: '1px' }}>SELECT ALL ICONS OF:</h3>
-                                <h2 style={{ margin: '5px 0 0', color: '#00ff89', fontFamily: 'Bebas Neue', fontSize: '36px', letterSpacing: '1px' }}>{targetCategory.toUpperCase()}</h2>
-                            </div>
-                            <button onClick={() => setShowCaptcha(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}><X size={20}/></button>
-                        </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-                            {captchaGrid.map((item, idx) => (
-                                <div key={idx} onClick={() => {
-                                    if (selectedIndices.includes(idx)) setSelectedIndices(selectedIndices.filter(i => i !== idx));
-                                    else setSelectedIndices([...selectedIndices, idx]);
-                                }} style={{
-                                    height: '80px', background: selectedIndices.includes(idx) ? 'rgba(0,255,137,0.1)' : '#080c10',
-                                    border: selectedIndices.includes(idx) ? '2px solid #00ff89' : '1px solid #1f2937',
-                                    borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    cursor: 'pointer', transition: '0.2s', color: selectedIndices.includes(idx) ? '#00ff89' : '#475569'
-                                }}>
-                                    {item.icon}
-                                    {selectedIndices.includes(idx) && (
-                                        <div style={{ position: 'absolute', top: '5px', right: '5px' }}>
-                                            <CheckCircle2 size={12} color="#00ff89" />
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-
-                        {captchaError && <div style={{ color: '#ef4444', fontSize: '11px', marginTop: '15px', textAlign: 'center', fontWeight: '800' }}>{captchaError}</div>}
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '25px', borderTop: '1px solid #30363d', paddingTop: '20px' }}>
-                            <RefreshCw size={20} color="#64748b" style={{ cursor: 'pointer' }} onClick={generateCaptcha} />
-                            <button onClick={handleVerifyCaptcha} style={{ background: '#00ff89', color: 'black', border: 'none', padding: '12px 30px', borderRadius: '10px', fontWeight: '800', fontSize: '14px', cursor: 'pointer' }}>
-                                VERIFY
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
         </div>
