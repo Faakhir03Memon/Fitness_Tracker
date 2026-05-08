@@ -352,3 +352,68 @@ body::before {
   border-radius: 10px;
   transition: width 1s ease;
 }
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 992px) {
+  .mid-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: 70px;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0 10px;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    z-index: 999;
+  }
+  
+  .logo {
+    display: none;
+  }
+  
+  .main {
+    margin-left: 0;
+    margin-bottom: 70px;
+    width: 100%;
+    padding: 20px;
+  }
+  
+  .greeting h1 {
+    font-size: 36px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .topbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-item {
+    width: 40px;
+    height: 40px;
+  }
+  .add-btn {
+    bottom: 90px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+  }
+}

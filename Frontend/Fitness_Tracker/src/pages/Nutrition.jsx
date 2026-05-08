@@ -268,8 +268,14 @@ const Nutrition = () => {
 
             <style>{`
                 .diet-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 40px; }
+                @media (max-width: 992px) {
+                    .diet-grid { grid-template-columns: 1fr; }
+                }
                 
                 .macro-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+                @media (max-width: 480px) {
+                    .macro-cards { grid-template-columns: 1fr; }
+                }
                 .macro-card { background: var(--bg-card); border: 1px solid var(--border); padding: 25px; border-radius: 20px; }
                 .mc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
                 .mc-label { font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; }
