@@ -259,17 +259,17 @@ const Profile = () => {
         .badge.eco { background: rgba(0, 255, 135, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 255, 135, 0.2); }
         .badge.pro { background: rgba(0, 212, 255, 0.1); color: var(--accent-cyan); border: 1px solid rgba(0, 212, 255, 0.2); }
 
-        .quick-metrics { display: flex; gap: 20px; margin-left: auto; }
+        .quick-metrics { display: flex; gap: 20px; margin-left: auto; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
         .metric-box {
             background: rgba(255,255,255,0.02); border: 1px solid var(--border);
-            padding: 15px 25px; border-radius: 18px; text-align: center; min-width: 110px;
+            padding: 15px 25px; border-radius: 18px; text-align: center; min-width: 110px; flex: 1;
         }
         .metric-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .metric-value { font-family: 'Bebas Neue'; font-size: 26px; color: white; line-height: 1; }
         .metric-unit { font-size: 12px; color: var(--text-muted); margin-left: 4px; }
 
         .modern-form { background: var(--bg-card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 30px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 30px; }
         .form-group label { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; margin-bottom: 10px; font-weight: 500; }
         .form-group input {
             width: 100%; background: #080c10; border: 1px solid var(--border);
