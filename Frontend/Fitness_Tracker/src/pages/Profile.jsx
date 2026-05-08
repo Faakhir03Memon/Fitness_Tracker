@@ -72,9 +72,6 @@ const Profile = () => {
               <X size={18} /> Cancel
             </button>
           )}
-          <button className="premium-btn logout" onClick={logout}>
-            <LogOut size={18} />
-          </button>
         </div>
       </div>
 
