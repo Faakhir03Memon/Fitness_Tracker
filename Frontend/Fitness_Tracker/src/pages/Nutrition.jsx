@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Salad, Zap, Heart, Plus, Search, Utensils, Brain, Flame, Info } from 'lucide-react';
+import { Salad, Zap, Heart, Plus, Search, Utensils, Brain, Flame, Info, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import API_BASE_URL from '../api/config';
 
@@ -122,6 +122,15 @@ const Nutrition = () => {
         }
     };
 
+    const handleDeleteMeal = async (mealId) => {
+        try {
+            await axios.delete(`${API_BASE_URL}/api/meals/${mealId}`, authConfig);
+            fetchData();
+        } catch (err) {
+            console.error('Error deleting meal', err);
+        }
+    };
+
     const generateAIRecommendation = (currentStats) => {
         const remainingPro = goals.pro - (currentStats.totalProtein || 0);
         const remainingCarb = goals.carb - (currentStats.totalCarbs || 0);
@@ -236,6 +245,15 @@ const Nutrition = () => {
                                         <div className="ml-meta">P:{m.protein}g C:{m.carbs}g F:{m.fats}g</div>
                                     </div>
                                     <div className="ml-cal">{m.calories} <span>KCAL</span></div>
+                                    <button 
+                                        onClick={() => handleDeleteMeal(m._id)}
+                                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '5px', marginLeft: '10px', transition: '0.3s' }}
+                                        title="Remove Food"
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
                                 </div>
                             ))}
                         </div>
