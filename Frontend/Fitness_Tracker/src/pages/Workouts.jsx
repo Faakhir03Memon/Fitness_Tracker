@@ -67,8 +67,8 @@ const Workouts = () => {
 
       <div className="section-label" style={{ marginTop: '50px' }}>RECOMMENDED FOR TODAY</div>
       <div className="workout-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))' }}>
-        <SuggestionCard title="High Intensity Interval" time="25 mins" cals="350" color="var(--accent-purple)" />
-        <SuggestionCard title="Mobility & Stretching" time="15 mins" cals="80" color="var(--accent-orange)" />
+        <SuggestionCard title="High Intensity Interval" time="25 mins" cals="350" color="var(--accent-purple)" videoUrl="https://www.youtube.com/watch?v=M0uO8X3_tEA" />
+        <SuggestionCard title="Mobility & Stretching" time="15 mins" cals="80" color="var(--accent-orange)" videoUrl="https://www.youtube.com/watch?v=Ef6LwAaB3_E" />
       </div>
 
       <style>{`
@@ -119,7 +119,7 @@ const DetailedWorkoutCard = ({ workout }) => (
     </div>
 );
 
-const SuggestionCard = ({ title, time, cals, color }) => (
+const SuggestionCard = ({ title, time, cals, color, videoUrl }) => (
   <div className="workout-card" style={{ position: 'relative', overflow: 'hidden' }}>
     <div style={{ position: 'absolute', top: '-10px', right: '-10px', width: '100px', height: '100px', background: `${color}10`, borderRadius: '50%' }}></div>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
@@ -127,7 +127,11 @@ const SuggestionCard = ({ title, time, cals, color }) => (
         <div className="wc-title" style={{fontFamily: 'Bebas Neue', fontSize: '24px'}}>{title.toUpperCase()}</div>
         <div className="wc-meta" style={{ marginBottom: '0', fontWeight: '600' }}>{time} • {cals} Kcal</div>
       </div>
-      <button className="add-btn" style={{ position: 'static', width: '45px', height: '45px', background: color, color: '#000' }}>
+      <button 
+        className="add-btn" 
+        onClick={() => window.open(videoUrl, '_blank')}
+        style={{ position: 'static', width: '45px', height: '45px', background: color, color: '#000', cursor: 'pointer' }}
+      >
         <Play size={20} fill="#000" />
       </button>
     </div>
